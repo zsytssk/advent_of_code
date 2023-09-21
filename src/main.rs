@@ -1,6 +1,6 @@
+mod day1;
+mod utils;
+
 fn main() {
-    let v = vec![1, 2, 3];
-    for i in v.len()..0 {
-        println!("{}", i);
-    }
+    day1::parse();
 }
