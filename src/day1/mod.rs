@@ -1,28 +1,12 @@
 use crate::utils::read_file;
 use regex::Regex;
 
-pub fn parse() {
-    parse1();
-
-    parse2_1();
-}
-fn parse2_1() {
-    let content = read_file("day1/input2.txt").unwrap();
-
-    let mut arr: Vec<i32> = content
-        .split("\n\n")
-        .map(|x| x.split("\n").map(|x| x.parse::<i32>().unwrap()).sum())
-        .collect();
-
-    arr.sort();
-
-    let len = arr.len();
-    let a: i32 = arr[len - 3..len].iter().sum();
-
-    println!("parse1: {:?}", a);
+pub fn _parse() {
+    _parse1();
+    _parse2();
 }
 
-fn parse1() {
+fn _parse1() {
     let content = read_file("day1/input.txt").unwrap();
     let multi_line_reg = Regex::new(r"\n{2,}").unwrap();
     let line_reg = Regex::new(r"\n").unwrap();
@@ -38,5 +22,21 @@ fn parse1() {
         .max()
         .unwrap();
 
-    println!("parse2: {:?}", arr);
+    println!("round1: {:?}", arr);
+}
+
+fn _parse2() {
+    let content = read_file("day1/input.txt").unwrap();
+
+    let mut arr: Vec<i32> = content
+        .split("\n\n")
+        .map(|x| x.split("\n").map(|x| x.parse::<i32>().unwrap()).sum())
+        .collect();
+
+    arr.sort();
+
+    let len = arr.len();
+    let a: i32 = arr[len - 3..len].iter().sum();
+
+    println!("round2: {:?}", a);
 }
