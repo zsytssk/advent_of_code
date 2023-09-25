@@ -1,8 +1,10 @@
 mod day1;
 mod day2;
+mod day3;
 mod utils;
 
 fn main() {
-    // day1::_parse();
-    day2::_parse();
+    // day1::parse();
+    // day2::parse();
+    day3::parse();
 }

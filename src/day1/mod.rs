@@ -1,12 +1,13 @@
+#![allow(unused)]
 use crate::utils::read_file;
 use regex::Regex;
 
-pub fn _parse() {
-    _parse1();
-    _parse2();
+pub fn parse() {
+    parse1();
+    parse2();
 }
 
-fn _parse1() {
+fn parse1() {
     let content = read_file("day1/input.txt").unwrap();
     let multi_line_reg = Regex::new(r"\n{2,}").unwrap();
     let line_reg = Regex::new(r"\n").unwrap();
@@ -25,7 +26,7 @@ fn _parse1() {
     println!("round1: {:?}", arr);
 }
 
-fn _parse2() {
+fn parse2() {
     let content = read_file("day1/input.txt").unwrap();
 
     let mut arr: Vec<i32> = content

@@ -1,3 +1,4 @@
+#![allow(unused)]
 use crate::utils::read_file;
 
 #[derive(Debug)]
@@ -6,6 +7,7 @@ enum GameType {
     Paper,
     Scissors,
 }
+
 #[derive(Debug)]
 enum MatchType {
     Lost,
@@ -13,12 +15,12 @@ enum MatchType {
     Won,
 }
 
-pub fn _parse() {
-    _parse1();
-    _parse2();
+pub fn parse() {
+    parse1();
+    parse2();
 }
 
-fn _parse1() {
+fn parse1() {
     let content = read_file("day2/input.txt").unwrap();
     let result: u32 = content
         .split("\n")
@@ -37,7 +39,7 @@ fn _parse1() {
     println!("round1 {:?}", result);
 }
 
-fn _parse2() {
+fn parse2() {
     let content = read_file("day2/input.txt").unwrap();
     let result: u32 = content
         .split("\n")
@@ -68,6 +70,7 @@ fn get_type_from_str(my_str: &str) -> GameType {
         _ => panic!("cant find game type for {}", my_str),
     }
 }
+
 fn get_result_from_str(my_str: &str) -> MatchType {
     match my_str {
         "X" => MatchType::Lost,
@@ -84,6 +87,7 @@ fn get_score_from_type(game_type: &GameType) -> u8 {
         GameType::Scissors => 3,
     }
 }
+
 fn get_score_from_match(match_type: &MatchType) -> u8 {
     match match_type {
         MatchType::Lost => 0,
@@ -91,6 +95,7 @@ fn get_score_from_match(match_type: &MatchType) -> u8 {
         MatchType::Won => 6,
     }
 }
+
 fn get_match_result(my: &GameType, op: &GameType) -> MatchType {
     match (my, op) {
         (GameType::Rock, GameType::Rock)
@@ -104,6 +109,7 @@ fn get_match_result(my: &GameType, op: &GameType) -> MatchType {
         | (GameType::Scissors, GameType::Rock) => MatchType::Lost,
     }
 }
+
 fn get_my_score_from_rest(op: &GameType, res: &MatchType) -> GameType {
     match (op, res) {
         (GameType::Rock, MatchType::Draw)
