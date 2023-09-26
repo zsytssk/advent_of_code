@@ -1,4 +1,4 @@
-https://adventofcode.com/2022/day/3#part2
+https://adventofcode.com/2022/day/4
 
 ownerproof-3155442-1695261524-344d6e3a17b9
 
