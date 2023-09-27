@@ -6,6 +6,8 @@ https://song.xlog.app/aoc-zh
 
 ## 2023-09-22 09:42:11
 
+- @ques destruct vec
+
 - @ques 如何获得 match`_`中的选项
 - @ques rust cell 获得内部改动的原因是什么？
 - @ques sizeOf(struct)
