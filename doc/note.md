@@ -4,6 +4,41 @@ ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
+## 2023-09-28 22:29:15
+
+- @ques slice 中怎么 remove 多个
+  - drain
+
+```rs
+// 这段代码为什么会报错
+fn main() {
+    let mut a = vec![1, 2, 3, 4, 5];
+    let arr = a.drain(0..2);
+    println!("{:?} {:?}", a, arr);
+}
+```
+
+```rs
+// 这个怎么没有log
+let m = re.captures_iter(hay).map(|str| {
+  println!("{:?}", &str.get(1).unwrap());
+});
+```
+
+```rs
+re.captures_iter(hay)
+```
+
+```rs
+// 报错？exclusive range pattern syntax is experimental
+fn is_item(c: &char) -> bool {
+    match c {
+        'A'..'Z' => true,
+        _ => false,
+    }
+}
+```
+
 ## 2023-09-22 09:42:11
 
 - @ques destruct vec
