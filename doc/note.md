@@ -6,6 +6,11 @@ https://song.xlog.app/aoc-zh
 
 ## 2023-09-28 22:29:15
 
+- @todo 优化 is_marker 返回重复的 index
+
+  - 如果有多个重复怎么处理
+  - ??
+
 - @ques slice 中怎么 remove 多个
   - drain
 
