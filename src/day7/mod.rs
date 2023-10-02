@@ -27,12 +27,23 @@ fn parse1() {
     let s = parse_input();
     let lines: Vec<&str> = s.split("\n").collect();
     let root = execute(lines);
-    println!("root = {:?}", root);
+    dbg!(&root);
+
+    let mut sub_dir = Dir::get_sub_dir(&root);
+    sub_dir.insert(0, root);
+
+    println!("size1 = {:?}", Dir::get_wrap_size(sub_dir.get(1).unwrap()));
+    // let size_vec: Vec<u32> = sub_dir
+    //     .iter()
+    //     .map(|item| Dir::get_wrap_size(item))
+    //     .collect();
+
+    // println!("size_all = {:?}", size_vec);
 }
 
 fn parse2() {}
 
-fn execute(mut lines: Vec<&str>) -> DirWrap {
+fn execute(mut lines: Vec<&str>) -> ChildWrap {
     let mut root = Dir::new_rf("root");
 
     let mut cur_dir = Rc::clone(&root);
@@ -43,19 +54,25 @@ fn execute(mut lines: Vec<&str>) -> DirWrap {
         let cmd = parse_line(line);
         match cmd {
             Cmd::Cd(s) => {
-                println!("cd {}", s);
+                // println!("cd {}", s);
                 if s == "/" {
                     cur_dir = Rc::clone(&root);
                 } else if s == ".." {
-                    let cur_dir = Rc::clone(&cur_dir);
+                    let parent = Dir::get_wrap_parent(&cur_dir);
+                    cur_dir = match parent {
+                        Some(p) => p,
+                        Node => {
+                            panic!("cant find parent for: {}", s);
+                        }
+                    };
                 } else {
                 }
             }
             Cmd::Ls => {
                 let ls_con = get_ls_content(index, &lines);
-                println!("ls_con {:?}", ls_con);
+                // println!("ls_con {:?}", ls_con);
                 for child in ls_con {
-                    Dir::add_child(&cur_dir, child);
+                    Dir::add_child(&mut cur_dir, child);
                 }
             }
         }

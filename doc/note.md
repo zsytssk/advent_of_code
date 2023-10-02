@@ -6,6 +6,8 @@ https://song.xlog.app/aoc-zh
 
 ## 2023-09-28 22:29:15
 
+- @ques impl deref from NodeType
+
 - @ques weakRef
 
 - @ques rust 如何在 loop 中改变 vec 的值
