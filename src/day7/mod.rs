@@ -27,18 +27,17 @@ fn parse1() {
     let s = parse_input();
     let lines: Vec<&str> = s.split("\n").collect();
     let root = execute(lines);
-    dbg!(&root);
 
     let mut sub_dir = Dir::get_sub_dir(&root);
     sub_dir.insert(0, root);
 
-    println!("size1 = {:?}", Dir::get_wrap_size(sub_dir.get(1).unwrap()));
-    // let size_vec: Vec<u32> = sub_dir
-    //     .iter()
-    //     .map(|item| Dir::get_wrap_size(item))
-    //     .collect();
+    let size_vec: u32 = sub_dir
+        .iter()
+        .map(|item| Dir::get_wrap_size(item))
+        .filter(|&i| i < 100000)
+        .sum();
 
-    // println!("size_all = {:?}", size_vec);
+    println!("size_all = {:?}", size_vec);
 }
 
 fn parse2() {}
@@ -54,23 +53,18 @@ fn execute(mut lines: Vec<&str>) -> ChildWrap {
         let cmd = parse_line(line);
         match cmd {
             Cmd::Cd(s) => {
-                // println!("cd {}", s);
                 if s == "/" {
                     cur_dir = Rc::clone(&root);
                 } else if s == ".." {
-                    let parent = Dir::get_wrap_parent(&cur_dir);
-                    cur_dir = match parent {
-                        Some(p) => p,
-                        Node => {
-                            panic!("cant find parent for: {}", s);
-                        }
-                    };
+                    cur_dir = Dir::get_wrap_parent(&cur_dir)
+                        .expect(format!("cant find parent {}", s).as_str());
                 } else {
+                    cur_dir = Dir::find_child_dir(&cur_dir, &s)
+                        .expect(format!("cant find dir {}", s).as_str());
                 }
             }
             Cmd::Ls => {
                 let ls_con = get_ls_content(index, &lines);
-                // println!("ls_con {:?}", ls_con);
                 for child in ls_con {
                     Dir::add_child(&mut cur_dir, child);
                 }
@@ -136,7 +130,7 @@ fn parse_ls_item(line: &str) -> NodeType {
 }
 
 fn parse_input() -> String {
-    let content = read_file("day7/demo.txt").unwrap();
+    let content = read_file("day7/input.txt").unwrap();
 
     content
 }

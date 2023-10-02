@@ -1,5 +1,4 @@
 use std::{
-    borrow::BorrowMut,
     cell::RefCell,
     rc::{Rc, Weak},
 };
@@ -36,7 +35,7 @@ impl Dir {
         })))
     }
     pub fn find_child_dir(parent: &ChildWrap, name: &str) -> Option<ChildWrap> {
-        let NodeType::Dir(dir) =  &*parent.borrow() else {
+        let NodeType::Dir(dir) = &*parent.borrow() else {
             panic!("not a dir");
         };
 
@@ -77,7 +76,7 @@ impl Dir {
     pub fn set_parent(&mut self, dir: ParentWrap) {
         self.parent = Some(dir);
     }
-    pub fn add_child(parent: &mut ChildWrap, mut child: NodeType) {
+    pub fn add_child(parent: &ChildWrap, mut child: NodeType) {
         match &mut child {
             NodeType::File(file) => {
                 file.set_parent(Rc::downgrade(parent));
@@ -86,20 +85,23 @@ impl Dir {
                 dir.set_parent(Rc::downgrade(&parent));
             }
         }
-        let mut a = &*parent.borrow();
-        match &*parent.borrow() {
-            NodeType::Dir(dir) => dir.child.push(Rc::new(RefCell::new(child))),
+        match &mut *parent.borrow_mut() {
+            NodeType::Dir(dir) => {
+                dir.child.push(Rc::new(RefCell::new(child)));
+            }
             _ => {}
         }
     }
     pub fn get_wrap_parent(wrap: &ChildWrap) -> Option<ChildWrap> {
         match &*wrap.borrow() {
             NodeType::Dir(dir) => {
-                let parent = &dir.parent;
-                Some((parent.unwrap().upgrade().unwrap()))
+                // let parent =
+                return match &dir.parent {
+                    Some(parent) => parent.upgrade(),
+                    None => None,
+                };
             }
             _ => None,
-            NodeType::File(file) => None,
         }
     }
     pub fn get_wrap_size(wrap: &ChildWrap) -> u32 {
@@ -112,7 +114,6 @@ impl Dir {
     pub fn get_size(&self) -> u32 {
         let mut size = 0;
 
-        println!("{:?}", &self.child);
         for item in self.child.iter() {
             match &*item.borrow() {
                 NodeType::File(file) => size = size + file.size,
