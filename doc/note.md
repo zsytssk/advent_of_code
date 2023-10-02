@@ -6,6 +6,18 @@ https://song.xlog.app/aoc-zh
 
 ## 2023-09-28 22:29:15
 
+- @ques weakRef
+
+- @ques rust 如何在 loop 中改变 vec 的值
+
+```
+可能while loop 可以
+```
+
+- @ques rust 双向绑定
+
+  - https://rust-unofficial.github.io/too-many-lists/fourth-final.html
+
 - @todo 优化 is_marker 返回重复的 index
 
   - 如果有多个重复怎么处理
