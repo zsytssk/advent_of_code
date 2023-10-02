@@ -19,8 +19,8 @@ enum Cmd {
 // get_node_by_path
 // https://adventofcode.com/2022/day/7
 pub fn parse() {
-    parse1();
-    // parse2();
+    // parse1();
+    parse2();
 }
 
 fn parse1() {
@@ -40,10 +40,35 @@ fn parse1() {
     println!("size_all = {:?}", size_vec);
 }
 
-fn parse2() {}
+fn parse2() {
+    let s = parse_input();
+    let lines: Vec<&str> = s.split("\n").collect();
+    let root = execute(lines);
 
-fn execute(mut lines: Vec<&str>) -> ChildWrap {
-    let mut root = Dir::new_rf("root");
+    let mut sub_dir = Dir::get_sub_dir(&root);
+    sub_dir.insert(0, root);
+
+    let mut size_vec = sub_dir
+        .iter()
+        .map(|item| (Dir::get_wrap_name(item), Dir::get_wrap_size(item)))
+        .collect::<Vec<(String, u32)>>();
+
+    size_vec.sort_by(|a, b| a.1.cmp(&b.1));
+
+    let total_size = 30000000 - (70000000 - size_vec.last().unwrap().1);
+
+    for item in size_vec.iter() {
+        if item.1 > total_size {
+            println!("{} = {}", item.0, item.1);
+            break;
+        }
+    }
+
+    // println!("size:list = {:?}", size_vec);
+}
+
+fn execute(mut lines: Vec<&str>) -> NodeWrap {
+    let mut root = Dir::new_wrap("root");
 
     let mut cur_dir = Rc::clone(&root);
     for (index, line) in lines.iter().enumerate() {

@@ -10,6 +10,8 @@ https://song.xlog.app/aoc-zh
 
 - @ques `&*wrap.borrow()`
 
+- @ques 用 `MyStruct(Rc<RefCell<NodeType>>)` 改写 Dir 等
+
 - @ques rust 这种嵌套 然后再解析 太麻烦了
 
   - 然后要对里面做处理 如果我能根据需要给他自动生成不同的类型，这个问题是不是就解决了
