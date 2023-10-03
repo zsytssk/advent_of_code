@@ -16,7 +16,8 @@ enum Cmd {
 }
 
 // resolve path
-// node.rs 使用起来非常，有什么办法来优化
+// node.rs 使用起来非常麻烦，有什么办法来优化
+// 这里面最大的问题是 每一步操作都要去做判断 NodeType，还有就是NodeWrap和node的转化
 // https://adventofcode.com/2022/day/7
 pub fn parse() {
     // parse1();
