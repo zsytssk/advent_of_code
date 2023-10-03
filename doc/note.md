@@ -6,6 +6,8 @@ https://song.xlog.app/aoc-zh
 
 ## 2023-09-28 22:29:15
 
+- @ques vscode rust debug
+
 - @ques 用 `MyStruct(Rc<RefCell<NodeType>>)` 改写 Dir 等
 
 - @ques 为什么
