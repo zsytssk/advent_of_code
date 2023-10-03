@@ -16,7 +16,7 @@ enum Cmd {
 }
 
 // resolve path
-// node.rs 使用起来非常，有什么办法来优化
+// get_node_by_path
 // https://adventofcode.com/2022/day/7
 pub fn parse() {
     // parse1();

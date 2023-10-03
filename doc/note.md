@@ -6,11 +6,11 @@ https://song.xlog.app/aoc-zh
 
 ## 2023-09-28 22:29:15
 
+- @ques 用 `MyStruct(Rc<RefCell<NodeType>>)` 改写 Dir 等
+
 - @ques 为什么
 
 - @ques `&*wrap.borrow()`
-
-- @ques 用 `MyStruct(Rc<RefCell<NodeType>>)` 改写 Dir 等
 
 - @ques rust 这种嵌套 然后再解析 太麻烦了
 
