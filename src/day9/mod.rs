@@ -19,7 +19,6 @@ fn parse1() {
 
     let mut head_pos = Point::new(0, 0);
     let mut tail_pos = Point::new(0, 0);
-    let mut head_move_points = vec![head_pos];
     let mut tail_move_points = vec![tail_pos];
 
     for item in &arr {
@@ -37,14 +36,8 @@ fn parse1() {
                 _ => continue,
             }
         }
-        head_pos = head_pos.move_to(&item);
-        for point in head_points {
-            if head_move_points.contains(&point) == false {
-                head_move_points.push(point);
-            }
-        }
+        head_pos = head_points[head_points.len() - 1].clone();
     }
-    // println!("head_move_points = {:?} ", head_move_points);
     println!("tail_move_points={:?}", tail_move_points.len());
 }
 
@@ -67,25 +60,19 @@ fn parse2() {
                     Some(pt) => {
                         cur_hp = pt.clone();
                         *item_p = pt.clone();
-                        if index == 8 {
-                            if tail_move_points.contains(&pt) == false {
-                                tail_move_points.push(pt);
-                            }
-                        }
                     }
                     _ => {
                         cur_hp = item_p.clone();
                     }
                 }
             }
+            if tail_move_points.contains(&cur_hp) == false {
+                tail_move_points.push(cur_hp);
+            }
         }
-        head_pos = head_pos.move_to(&item);
-        // println!(
-        //     "test:>2:>head_pos={:?}, rest_pos_arr={:?}",
-        //     head_pos, rest_pos_arr
-        // );
+        head_pos = head_points[head_points.len() - 1].clone();
     }
-    println!("tail_move_points={:?}", tail_move_points.len(),);
+    println!("tail_move_points={:?}", tail_move_points.len());
 }
 
 fn adjust_map(pos: &Point, mo: &Move, map: &mut (u32, u32)) {
@@ -99,7 +86,7 @@ fn adjust_map(pos: &Point, mo: &Move, map: &mut (u32, u32)) {
 }
 
 fn parse_input() -> Vec<Move> {
-    let content = read_file("day9/demo1.txt").unwrap();
+    let content = read_file("day9/input.txt").unwrap();
     let arr = content
         .split("\n")
         .map(|line| {
