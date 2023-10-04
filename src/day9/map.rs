@@ -1,4 +1,4 @@
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub enum Dir {
     Right,
     Left,
@@ -61,4 +61,17 @@ impl PartialEq for Point {
 
 pub fn mul_move_unit(unit: Distance, space: i32) -> Distance {
     (unit.0 * space, unit.1 * space)
+}
+pub fn get_tail_next(tail_pos: &Point, head_pos: &Point) -> Option<Point> {
+    let dis = (head_pos.0 - tail_pos.0, head_pos.1 - tail_pos.1);
+    let is_near = dis.0.abs() <= 1 && dis.1.abs() <= 1;
+
+    if (is_near) {
+        return None;
+    }
+
+    let unit_x = if dis.0 == 0 { 0 } else { dis.0 / dis.0.abs() };
+    let unit_y = if dis.1 == 0 { 0 } else { dis.1 / dis.1.abs() };
+
+    return Some(Point::new(tail_pos.0 + unit_x, tail_pos.1 + unit_y));
 }

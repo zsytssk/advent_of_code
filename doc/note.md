@@ -7,6 +7,10 @@ https://song.xlog.app/aoc-zh
 ## 2023-10-04 11:20:55
 
 - @ques Point 如何自定义乘法+加法
+- @ques Point Copy
+
+### 2023-10-04 15:04:47
+
 - @ques Point 相等
 
 ## 2023-09-28 22:29:15
