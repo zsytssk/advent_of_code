@@ -14,22 +14,22 @@ pub fn parse() {
 
 fn parse1() {
     let arr = parse_input();
-    let mut map: (u32, u32) = (0, 0);
+    // let mut map: (u32, u32) = (0, 0);
 
-    let mut cur_pos = Point::new(0, 0);
+    let mut head_pos = Point::new(0, 0);
     let mut move_points = Vec::new();
 
     for item in &arr {
-        adjust_map(&cur_pos, item, &mut map);
-        let points = cur_pos.get_move_points(&item);
-        cur_pos = cur_pos.move_to(&item);
+        // adjust_map(&head_pos, item, &mut map);
+        let points = head_pos.get_move_points(&item);
+        head_pos = head_pos.move_to(&item);
         for point in points {
             if move_points.contains(&point) == false {
                 move_points.push(point);
             }
         }
     }
-    println!("{:?} {:?} {:?}", map, move_points, cur_pos);
+    println!(" {:?} {:?}", move_points, head_pos);
 }
 
 fn parse2() {}
