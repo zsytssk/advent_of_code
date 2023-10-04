@@ -90,12 +90,15 @@ fn parse_input() -> Vec<Move> {
     let arr = content
         .split("\n")
         .map(|line| {
-            let arr = line.split(" ").collect::<Vec<&str>>();
-            let dir = Dir::from_str(arr[0]);
-            let space = arr[1].parse::<i32>().unwrap();
+            let mut arr = line.split(" ");
+            let dir_str = arr.next()?;
+            let dir = Dir::from_str(dir_str);
+            let space = arr.next()?.parse::<i32>().ok()?;
 
-            (dir, space)
+            Some((dir, space))
         })
+        .filter(|item| item.is_some())
+        .map(|item| item.unwrap())
         .collect::<Vec<_>>();
 
     arr
