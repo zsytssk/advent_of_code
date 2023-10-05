@@ -19,5 +19,6 @@ fn main() {
     // day6::parse();
     // day7::parse();
     // day8::parse();
-    day9::parse();
+    // day9::parse();
+    day10::parse();
 }
