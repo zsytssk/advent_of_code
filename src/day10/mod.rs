@@ -10,13 +10,13 @@ enum Cmd {
 
 // https://adventofcode.com/2022/day/10
 pub fn parse() {
-    parse1();
-    // parse2();
+    // parse1();
+    parse2();
 }
 
 fn parse1() {
     let signals = parse_input();
-
+    // println!("{:?}", signals);
     let mut marks_signals: Vec<i32> = Vec::new();
     let marks = [20, 60, 100, 140, 180, 220];
     for mark in marks {
@@ -29,24 +29,6 @@ fn parse1() {
         }
     }
 
-    // for mark in marks {
-    //     let mut find = signals.iter().find(|(cycle, num)| cycle == &mark);
-    //     if find.is_none() {
-    //         find = signals
-    //             .iter()
-    //             .find(|(cycle, num)| cycle.clone() == &mark - 1);
-    //     }
-    //     if mark == 220 {
-    //         println!("{:?}", find);
-    //     }
-    //     match find {
-    //         Some(t) => {
-    //             marks_signals.push(mark * t.1);
-    //         }
-    //         _ => {}
-    //     }
-    // }
-
     println!(
         "{:?} {:?}",
         marks_signals,
@@ -56,15 +38,40 @@ fn parse1() {
 
 fn parse2() {
     let signals = parse_input();
+    // println!("{:?}", signals);
+    let mut arr: Vec<Vec<&str>> = Vec::new();
     for i in 0..=5 {
+        let mut list: Vec<&str> = Vec::new();
         for j in 1..=40 {
             let cur_index = j + i * 40;
-            let cur_signal = get_cur_pos2(cur_index, &signals);
-            println!("cur_index={:?} ={:?}", cur_index, cur_signal)
+            let cur_signal = get_cur_pos(cur_index, &signals);
+            let cur_mark_pos = match cur_signal {
+                Some(t) => t.1,
+                _ => 1,
+            };
+
+            let show_mark = j - cur_mark_pos <= 2 && j - cur_mark_pos >= 0;
+            if show_mark {
+                list.push("#");
+            } else {
+                list.push(".");
+            }
+            if cur_index == 10 {
+                println!(
+                    "cur_index={:?} cur_mark_pos={:?} match={:?}",
+                    cur_index,
+                    cur_mark_pos,
+                    (j - cur_mark_pos).abs() < 2
+                )
+            }
         }
+        arr.push(list);
     }
 
-    println!("{:?}", signals);
+    // RFKZCPEF
+    for line in arr.iter() {
+        println!("{:?}", line.join(""));
+    }
 }
 
 fn get_cur_pos(
@@ -84,29 +91,8 @@ fn get_cur_pos(
     }
 }
 
-fn get_cur_pos2(
-    cur_index: i32,
-    signals: &Vec<(i32, i32)>,
-) -> Option<(i32, i32)> {
-    let mut local_index = cur_index - 1;
-    if local_index < 1 {
-        local_index = 1
-    }
-    let mut find = signals.iter().find(|(cycle, num)| cycle == &local_index);
-    if find.is_none() {
-        find = signals
-            .iter()
-            .find(|(cycle, num)| cycle.clone() == &local_index - 1);
-    }
-
-    match find {
-        Some(t) => Some((t.0.clone(), t.0.clone())),
-        _ => None,
-    }
-}
-
 fn parse_input() -> Vec<(i32, i32)> {
-    let content = read_file("day10/demo.txt").unwrap();
+    let content = read_file("day10/input.txt").unwrap();
 
     let arr = content
         .split("\n")
