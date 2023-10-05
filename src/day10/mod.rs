@@ -19,26 +19,8 @@ fn parse1() {
 
     let mut marks_signals: Vec<i32> = Vec::new();
     let marks = [20, 60, 100, 140, 180, 220];
-    // for mark in marks {
-    //     let find = get_cur_pos(mark, &signals);
-    //     match find {
-    //         Some(t) => {
-    //             marks_signals.push(mark * t.1);
-    //         }
-    //         _ => {}
-    //     }
-    // }
-
     for mark in marks {
-        let mut find = signals.iter().find(|(cycle, num)| cycle == &mark);
-        if find.is_none() {
-            find = signals
-                .iter()
-                .find(|(cycle, num)| cycle.clone() == &mark - 1);
-        }
-        if mark == 220 {
-            println!("{:?}", find);
-        }
+        let find = get_cur_pos(mark, &signals);
         match find {
             Some(t) => {
                 marks_signals.push(mark * t.1);
@@ -46,6 +28,24 @@ fn parse1() {
             _ => {}
         }
     }
+
+    // for mark in marks {
+    //     let mut find = signals.iter().find(|(cycle, num)| cycle == &mark);
+    //     if find.is_none() {
+    //         find = signals
+    //             .iter()
+    //             .find(|(cycle, num)| cycle.clone() == &mark - 1);
+    //     }
+    //     if mark == 220 {
+    //         println!("{:?}", find);
+    //     }
+    //     match find {
+    //         Some(t) => {
+    //             marks_signals.push(mark * t.1);
+    //         }
+    //         _ => {}
+    //     }
+    // }
 
     println!(
         "{:?} {:?}",
@@ -79,7 +79,7 @@ fn get_cur_pos(
     }
 
     match find {
-        Some(t) => Some((t.0.clone(), t.0.clone())),
+        Some(t) => Some((t.0.clone(), t.1.clone())),
         _ => None,
     }
 }
