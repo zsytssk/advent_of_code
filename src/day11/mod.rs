@@ -1,22 +1,55 @@
 #![allow(unused)]
 
+use std::{borrow::BorrowMut, cell::Cell};
+
 use crate::utils::read_file;
 
+mod monkey;
+
+use monkey::*;
 // https://adventofcode.com/2022/day/11
 pub fn parse() {
-    // parse1();
-    parse2();
+    parse1();
+    // parse2();
 }
 
 fn parse1() {
-    let content = parse_input();
-    println!("{}", content)
+    let mut monkeys = parse_input();
+    let len = monkeys.len();
+
+    for round in 0..20 {
+        for i in 0..len {
+            let monkey = &mut monkeys[i];
+            let res = monkey.run();
+            for (index, item) in res {
+                monkeys[index as usize].add_num_list(item);
+            }
+        }
+    }
+    let mut inspected_items = monkeys
+        .iter()
+        .map(|m| m.get_inspected_items())
+        .collect::<Vec<_>>();
+
+    // inspected_items.sort();
+
+    // let last_two = inspected_items.split_off(inspected_items.len() - 2);
+
+    // let last1 = inspected_items[inspected_items.len() - 1];
+    // let last2 = inspected_items[inspected_items.len() - 2];
+
+    println!("{:?}", inspected_items);
 }
 
 fn parse2() {}
 
-fn parse_input() -> String {
-    let content = read_file("day11/input.txt").unwrap();
+fn parse_input() -> Vec<Monkey> {
+    let content = read_file("day11/demo.txt").unwrap();
 
-    content
+    let ms = content
+        .split("\n\n")
+        .map(Monkey::from_str)
+        .collect::<Vec<_>>();
+
+    return ms;
 }
