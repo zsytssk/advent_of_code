@@ -51,13 +51,15 @@ impl Monkey {
             if_false,
         }
     }
-    pub fn run(&mut self) -> Vec<(usize, usize)> {
+    pub fn run(&mut self, div_three: bool) -> Vec<(usize, usize)> {
         let mut res: Vec<(usize, usize)> = Vec::new();
 
         while self.items.len() > 0 {
             let item = self.items.remove(0);
             let mut num = self.opt.apply(&item);
-            num = num / 3;
+            if (div_three) {
+                num = num / 3;
+            }
             if is_divisible(num, self.div) {
                 res.push((self.if_true, num));
             } else {

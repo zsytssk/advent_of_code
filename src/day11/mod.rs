@@ -9,8 +9,8 @@ mod monkey;
 use monkey::*;
 // https://adventofcode.com/2022/day/11
 pub fn parse() {
-    parse1();
-    // parse2();
+    // parse1();
+    parse2();
 }
 
 fn parse1() {
@@ -20,7 +20,7 @@ fn parse1() {
     for round in 0..20 {
         for i in 0..len {
             let monkey = &mut monkeys[i];
-            let res = monkey.run();
+            let res = monkey.run(true);
             for (index, item) in res {
                 monkeys[index as usize].add_num_list(item);
             }
@@ -35,11 +35,33 @@ fn parse1() {
     let last1 = inspected_items[inspected_items.len() - 1];
     let last2 = inspected_items[inspected_items.len() - 2];
     println!("res {}", last1 * last2);
-
-    // let last_two = inspected_items.split_off(inspected_items.len() - 2);
 }
 
-fn parse2() {}
+fn parse2() {
+    let mut monkeys = parse_input();
+    let len = monkeys.len();
+
+    for round in 0..20 {
+        for i in 0..len {
+            let monkey = &mut monkeys[i];
+            let res = monkey.run(false);
+            for (index, item) in res {
+                monkeys[index as usize].add_num_list(item);
+            }
+        }
+    }
+    let mut inspected_items = monkeys
+        .iter()
+        .map(|m| m.get_inspected_items())
+        .collect::<Vec<_>>();
+
+    println!("res {:?}", inspected_items);
+
+    // inspected_items.sort();
+    // let last1 = inspected_items[inspected_items.len() - 1];
+    // let last2 = inspected_items[inspected_items.len() - 2];
+    // println!("res {}", last1 * last2);
+}
 
 fn parse_input() -> Vec<Monkey> {
     let content = read_file("day11/demo.txt").unwrap();
