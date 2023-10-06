@@ -31,14 +31,12 @@ fn parse1() {
         .map(|m| m.get_inspected_items())
         .collect::<Vec<_>>();
 
-    // inspected_items.sort();
+    inspected_items.sort();
+    let last1 = inspected_items[inspected_items.len() - 1];
+    let last2 = inspected_items[inspected_items.len() - 2];
+    println!("res {}", last1 * last2);
 
     // let last_two = inspected_items.split_off(inspected_items.len() - 2);
-
-    // let last1 = inspected_items[inspected_items.len() - 1];
-    // let last2 = inspected_items[inspected_items.len() - 2];
-
-    println!("{:?}", inspected_items);
 }
 
 fn parse2() {}

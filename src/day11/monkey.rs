@@ -1,12 +1,12 @@
 #[derive(Debug)]
 pub struct Monkey {
-    inspected_items: u32,
-    index: u32,
-    items: Vec<u32>,
+    inspected_items: usize,
+    index: usize,
+    items: Vec<usize>,
     opt: Operation,
-    div: u32,
-    if_true: u32,
-    if_false: u32,
+    div: usize,
+    if_true: usize,
+    if_false: usize,
 }
 
 impl Monkey {
@@ -24,20 +24,20 @@ impl Monkey {
         let m = monkey_reg.captures(str).unwrap();
         let (_, match_list): (&str, [&str; 7]) = m.extract();
 
-        let index: u32 = match_list[0].parse().unwrap();
-        let items: Vec<u32> = match_list[1]
+        let index: usize = match_list[0].parse().unwrap();
+        let items: Vec<usize> = match_list[1]
             .split(", ")
             .map(|x| x.parse().unwrap())
             .collect();
-        let div: u32 = match_list[4].parse().unwrap();
-        let if_true: u32 = match_list[5].parse().unwrap();
-        let if_false: u32 = match_list[6].parse().unwrap();
+        let div: usize = match_list[4].parse().unwrap();
+        let if_true: usize = match_list[5].parse().unwrap();
+        let if_false: usize = match_list[6].parse().unwrap();
 
         let opt = match (match_list[2], match_list[3]) {
             ("*", "old") => Operation::MulSelf,
             ("+", "old") => Operation::AddSelf,
-            ("+", s) => Operation::Add(s.parse::<u32>().unwrap()),
-            ("*", s) => Operation::Mul(s.parse::<u32>().unwrap()),
+            ("+", s) => Operation::Add(s.parse::<usize>().unwrap()),
+            ("*", s) => Operation::Mul(s.parse::<usize>().unwrap()),
             _ => panic!("unknown operation"),
         };
 
@@ -51,13 +51,13 @@ impl Monkey {
             if_false,
         }
     }
-    pub fn run(&mut self) -> Vec<(u32, u32)> {
-        let mut res: Vec<(u32, u32)> = Vec::new();
+    pub fn run(&mut self) -> Vec<(usize, usize)> {
+        let mut res: Vec<(usize, usize)> = Vec::new();
 
         while self.items.len() > 0 {
             let item = self.items.remove(0);
             let mut num = self.opt.apply(&item);
-            // num = num / 3;
+            num = num / 3;
             if is_divisible(num, self.div) {
                 res.push((self.if_true, num));
             } else {
@@ -68,10 +68,10 @@ impl Monkey {
 
         res
     }
-    pub fn add_num_list(&mut self, num: u32) {
+    pub fn add_num_list(&mut self, num: usize) {
         self.items.push(num);
     }
-    pub fn get_inspected_items(&self) -> u32 {
+    pub fn get_inspected_items(&self) -> usize {
         self.inspected_items.clone()
     }
 }
@@ -80,12 +80,12 @@ impl Monkey {
 pub enum Operation {
     MulSelf,
     AddSelf,
-    Mul(u32),
-    Add(u32),
+    Mul(usize),
+    Add(usize),
 }
 
 impl Operation {
-    pub fn apply(&self, old: &u32) -> u32 {
+    pub fn apply(&self, old: &usize) -> usize {
         match self {
             Operation::MulSelf => old * old,
             Operation::AddSelf => old + old,
@@ -95,7 +95,7 @@ impl Operation {
     }
 }
 
-fn is_divisible(num: u32, div: u32) -> bool {
+fn is_divisible(num: usize, div: usize) -> bool {
     let time = num / div;
     time * div == num
 }
