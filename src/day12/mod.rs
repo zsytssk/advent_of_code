@@ -1,14 +1,19 @@
 #![allow(unused)]
-use std::cell::{Ref, RefCell, RefMut};
+use std::{
+    cell::{Ref, RefCell, RefMut},
+    string,
+    time::Instant,
+};
 
 use crate::utils::read_file;
 
-mod point;
-use point::*;
+mod map;
+use map::*;
 
 // 如何求最短路径
 // 到某个点的最短距离
-// 怎么判断每一个步数的 效率？
+// 怎么判断每一个步数的 效率？ -> 每走3步找一个优先级 -> 卡死了这个优先级降低
+// 贪婪算法 ｜ 迟钝算法
 // 朝向他的为优先级高
 // 如何同时往多个方向寻找 + 如何
 pub fn parse() {
@@ -17,60 +22,88 @@ pub fn parse() {
 }
 
 fn parse1() {
+    let now = Instant::now();
     let map = parse_input();
 
-    let mut start = None;
-    let mut end = None;
+    let mut start_wap = None;
+    let mut end_wap = None;
 
     for y in 0..map.y {
         for x in 0..map.x {
-            let item = map.get_point(x, y).unwrap().borrow();
-            if item.has_letter("S") {
-                start = Some(item);
+            let item = map.get_point(x, y);
+            if item.unwrap().borrow().has_letter("S") {
+                start_wap = item;
                 continue;
             }
-            if item.has_letter("E") {
-                end = Some(item);
+            if item.unwrap().borrow().has_letter("E") {
+                end_wap = item;
             }
         }
     }
+    if (start_wap.is_none() || end_wap.is_none()) {
+        panic!("start or end not found!");
+    }
 
-    // println!("{:?}", map);
-    println!("{:?} {:?}", start, end);
+    let (start, end) = (start_wap.unwrap(), end_wap.unwrap());
+    let (find, step) = find_end_len(
+        start,
+        &map,
+        &vec![(start.borrow().x, start.borrow().y, String::from("S"))],
+    );
+
+    println!(
+        "find={:?} step={:?} cost_time={:?}",
+        end,
+        find,
+        now.elapsed()
+    );
 }
 
-fn parse_input() -> Map {
-    let content = read_file("day12/demo.txt").unwrap();
+fn find_end_len(
+    pos_wrap: &RefCell<Point>,
+    map: &Map,
+    path: &Vec<(usize, usize, String)>,
+) -> (bool, usize) {
+    let pos = pos_wrap.borrow();
 
-    let map_str = content
-        .split("\n")
-        .map(|line| {
-            line.split("")
-                .filter(|&item| item != "")
-                .collect::<Vec<_>>()
-        })
-        .collect::<Vec<_>>();
+    if pos.is_end() {
+        return (true, path.len());
+    }
 
-    let mut map = Map::new(map_str[0].len(), map_str.len());
-    for y in 0..map_str.len() {
-        let line_str = &map_str[y];
-        for x in 0..line_str.len() {
-            let p = Point::init(x, y, String::from(line_str[x]));
-            map.add_point(p);
+    let mut find_arr = Vec::new();
+    for dir in pos.get_move_dir().iter() {
+        let (x, y) = get_dir_pos(pos_wrap.borrow(), dir, map).unwrap();
+        if path_has_point(&path, (x, y)) {
+            continue;
+        }
+        let next_pos = map.get_point(x, y).unwrap();
+        let mut clone_path = path.clone();
+
+        clone_path.push((x, y, String::from(&next_pos.borrow().letter)));
+        let (find, step) = find_end_len(next_pos, map, &clone_path);
+        if find == true {
+            find_arr.push(step)
         }
     }
 
-    for y in 0..map_str.len() {
-        let line_str = &map_str[y];
-        for x in 0..line_str.len() {
-            match map.get_point(x, y) {
-                None => continue,
-                Some(p) => check_move(p, &map),
-            }
-        }
+    if find_arr.len() != 0 {
+        find_arr.sort_by(|a, b| a.cmp(&b));
+        return (true, find_arr[0]);
     }
 
-    map
+    return (false, 0);
+}
+
+fn path_has_point(
+    path: &Vec<(usize, usize, String)>,
+    point: (usize, usize),
+) -> bool {
+    for (x, y, _) in path {
+        if *x == point.0 && *y == point.1 {
+            return true;
+        }
+    }
+    return false;
 }
 
 fn check_move(mut point: &RefCell<Point>, map: &Map) {
@@ -125,4 +158,38 @@ fn get_dir_pos(
             return Some((point.x, point.y + 1));
         }
     }
+}
+
+fn parse_input() -> Map {
+    let content = read_file("day12/demo.txt").unwrap();
+
+    let map_str = content
+        .split("\n")
+        .map(|line| {
+            line.split("")
+                .filter(|&item| item != "")
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+
+    let mut map = Map::new(map_str[0].len(), map_str.len());
+    for y in 0..map_str.len() {
+        let line_str = &map_str[y];
+        for x in 0..line_str.len() {
+            let p = Point::init(x, y, String::from(line_str[x]));
+            map.add_point(p);
+        }
+    }
+
+    for y in 0..map_str.len() {
+        let line_str = &map_str[y];
+        for x in 0..line_str.len() {
+            match map.get_point(x, y) {
+                None => continue,
+                Some(p) => check_move(p, &map),
+            }
+        }
+    }
+
+    map
 }

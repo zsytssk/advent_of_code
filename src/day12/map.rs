@@ -69,8 +69,14 @@ impl Point {
     pub fn set_move_dir(&mut self, dir: Vec<Dir>) {
         self.move_dir = dir;
     }
+    pub fn get_move_dir(&self) -> &Vec<Dir> {
+        &self.move_dir
+    }
     pub fn can_move(&self, dir: Ref<Point>) -> bool {
-        if self.letter == String::from("S") {
+        if self.letter == String::from("S") && dir.letter == String::from("a") {
+            return true;
+        }
+        if self.letter == String::from("z") && dir.letter == String::from("E") {
             return true;
         }
         let self_char = self.letter.chars().nth(0).unwrap() as u8;
@@ -79,5 +85,8 @@ impl Point {
             return true;
         }
         return false;
+    }
+    pub fn is_end(&self) -> bool {
+        self.letter == String::from("E")
     }
 }
