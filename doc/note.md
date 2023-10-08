@@ -11,6 +11,15 @@ https://song.xlog.app/aoc-zh
   - path.clone() ？
 
 - 贪婪算法 ｜ 迟钝算法 ?
+- 有什么更好的算法？
+
+- 如何加快 step2 -> 可以优化下
+
+  - 从 end 找其他的，可以共用 map_space, 也许可以更快些
+  - 多线程？
+  - 算法 -> https://zhuanlan.zhihu.com/p/385733813
+  - ***
+  - 可寻找的点是一个数组不停的增加，然后在过程中可以更新各个点的优先级
 
 - @ques hashMap -> target -> space 如果更长就不用处理了
 

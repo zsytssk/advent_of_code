@@ -37,7 +37,6 @@ impl Map {
     }
 }
 
-#[derive(Debug)]
 pub struct Point {
     pub x: usize,
     pub y: usize,
@@ -51,6 +50,15 @@ pub enum Dir {
     Down,
     Left,
     Right,
+}
+
+impl std::fmt::Debug for Point {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Point")
+            .field("x", &self.x)
+            .field("y", &self.y)
+            .finish()
+    }
 }
 
 impl Point {

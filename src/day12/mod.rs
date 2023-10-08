@@ -13,8 +13,8 @@ use map::*;
 
 // https://adventofcode.com/2022/day/12#part2
 pub fn parse() {
-    parse1();
-    // parse2();
+    // parse1();
+    parse2();
 }
 
 fn parse1() {
@@ -48,6 +48,7 @@ fn parse1() {
         &map,
         &mut map_space,
         &vec![(start.borrow().x, start.borrow().y, String::from("S"))],
+        &usize::MAX,
     );
 
     println!(
@@ -58,15 +59,83 @@ fn parse1() {
     );
 }
 
+fn parse2() {
+    let now = Instant::now();
+    let map = parse_input();
+    let mut start_arr = Vec::new();
+    let mut end_wap = None;
+    for y in 0..map.y {
+        for x in 0..map.x {
+            let item = map.get_point(x, y);
+            let item_ref = item.unwrap().borrow();
+            if item_ref.has_letter("a") {
+                start_arr.push(item.unwrap());
+                continue;
+            }
+            if item_ref.has_letter("E") {
+                end_wap = item;
+            }
+        }
+    }
+
+    if (start_arr.len() == 0 || end_wap.is_none()) {
+        panic!("start or end not found!");
+    }
+
+    let end_p = end_wap.unwrap();
+    let end_ref = end_p.borrow();
+    start_arr.sort_by(|a, b| {
+        let a_ref = a.borrow();
+        let b_ref = b.borrow();
+        let a_space = (end_ref.x as i32 - a_ref.x as i32).abs()
+            + (end_ref.y as i32 - a_ref.y as i32).abs();
+        let b_space = (end_ref.x as i32 - b_ref.x as i32).abs()
+            + (end_ref.y as i32 - b_ref.y as i32).abs();
+        a_space.cmp(&b_space)
+    });
+
+    let mut min_path = usize::MAX;
+    for (index, start) in start_arr.iter().enumerate() {
+        let mut map_space: HashMap<String, usize> = HashMap::new();
+        let (find, step) = find_end_len(
+            start,
+            end_p,
+            &map,
+            &mut map_space,
+            &vec![(start.borrow().x, start.borrow().y, String::from("S"))],
+            &min_path,
+        );
+        if find && min_path > step {
+            min_path = step;
+            let rate = format!("{}/{}", index + 1, start_arr.len());
+            println!(
+                "rate={:?} start={:?} step={:?}",
+                rate,
+                start,
+                min_path - 1
+            );
+        }
+    }
+
+    println!("{:?} cost_time={:?}", min_path, now.elapsed());
+}
+
 fn find_end_len(
     pos_wrap: &RefCell<Point>,
     end_wrap: &RefCell<Point>,
     map: &Map,
     map_space: &mut HashMap<String, usize>,
     path: &Vec<(usize, usize, String)>,
+    min_step: &usize,
 ) -> (bool, usize) {
     let pos = pos_wrap.borrow();
     let key = format!("{}:{}", pos.x, pos.y);
+
+    // 不能超过最大的次数
+    if min_step <= &path.len() {
+        return (false, 0);
+    }
+
     match map_space.get(&key) {
         Some(v) => {
             if v <= &path.len() {
@@ -93,11 +162,14 @@ fn find_end_len(
         cur_arr.push(next_pos);
     }
 
+    let end_ref = end_wrap.borrow();
     cur_arr.sort_by(|a, b| {
-        let a_space = (end_wrap.borrow().x as i32 - a.borrow().x as i32).abs()
-            + (end_wrap.borrow().y as i32 - a.borrow().y as i32).abs();
-        let b_space = (end_wrap.borrow().x as i32 - b.borrow().x as i32).abs()
-            + (end_wrap.borrow().y as i32 - b.borrow().y as i32).abs();
+        let a_ref = a.borrow();
+        let b_ref = b.borrow();
+        let a_space = (end_ref.x as i32 - a_ref.x as i32).abs()
+            + (end_ref.y as i32 - a_ref.y as i32).abs();
+        let b_space = (end_ref.x as i32 - b_ref.x as i32).abs()
+            + (end_ref.y as i32 - b_ref.y as i32).abs();
 
         a_space.cmp(&b_space)
     });
@@ -105,12 +177,19 @@ fn find_end_len(
     let mut find_arr = Vec::new();
     for next_pos in cur_arr.iter() {
         let mut clone_path = path.clone();
-        let x = next_pos.borrow().x;
-        let y = next_pos.borrow().y;
+        let next_ref = next_pos.borrow();
+        let x = next_ref.x;
+        let y = next_ref.y;
 
-        clone_path.push((x, y, String::from(&next_pos.borrow().letter)));
-        let (find, step) =
-            find_end_len(next_pos, end_wrap, map, map_space, &clone_path);
+        clone_path.push((x, y, String::from(&next_ref.letter)));
+        let (find, step) = find_end_len(
+            next_pos,
+            end_wrap,
+            map,
+            map_space,
+            &clone_path,
+            min_step,
+        );
         if find == true {
             find_arr.push(step)
         }
