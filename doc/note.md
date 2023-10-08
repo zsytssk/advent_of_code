@@ -6,6 +6,16 @@ https://song.xlog.app/aoc-zh
 
 ## 2023-10-07 19:06:10
 
+- @ques 如何优化内存
+
+  - path.clone() ？
+
+- 贪婪算法 ｜ 迟钝算法 ?
+
+- @ques hashMap -> target -> space 如果更长就不用处理了
+
+### end
+
 - @ques 寻路怎么才能 不后退
 
 ## 2023-10-04 11:20:55

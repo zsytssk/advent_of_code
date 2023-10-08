@@ -1,6 +1,7 @@
 #![allow(unused)]
 use std::{
     cell::{Ref, RefCell, RefMut},
+    collections::HashMap,
     string,
     time::Instant,
 };
@@ -10,12 +11,7 @@ use crate::utils::read_file;
 mod map;
 use map::*;
 
-// 如何求最短路径
-// 到某个点的最短距离
-// 怎么判断每一个步数的 效率？ -> 每走3步找一个优先级 -> 卡死了这个优先级降低
-// 贪婪算法 ｜ 迟钝算法
-// 朝向他的为优先级高
-// 如何同时往多个方向寻找 + 如何
+// https://adventofcode.com/2022/day/12#part2
 pub fn parse() {
     parse1();
     // parse2();
@@ -44,43 +40,77 @@ fn parse1() {
         panic!("start or end not found!");
     }
 
+    let mut map_space: HashMap<String, usize> = HashMap::new();
     let (start, end) = (start_wap.unwrap(), end_wap.unwrap());
     let (find, step) = find_end_len(
         start,
+        end,
         &map,
+        &mut map_space,
         &vec![(start.borrow().x, start.borrow().y, String::from("S"))],
     );
 
     println!(
-        "find={:?} step={:?} cost_time={:?}",
-        end,
+        "find={:?} step={:?}  cost_time={:?}",
         find,
+        step - 1,
         now.elapsed()
     );
 }
 
 fn find_end_len(
     pos_wrap: &RefCell<Point>,
+    end_wrap: &RefCell<Point>,
     map: &Map,
+    map_space: &mut HashMap<String, usize>,
     path: &Vec<(usize, usize, String)>,
 ) -> (bool, usize) {
     let pos = pos_wrap.borrow();
+    let key = format!("{}:{}", pos.x, pos.y);
+    match map_space.get(&key) {
+        Some(v) => {
+            if v <= &path.len() {
+                return (false, 0);
+            }
+            map_space.insert(key, path.len());
+        }
+        None => {
+            map_space.insert(key, path.len());
+        }
+    }
 
     if pos.is_end() {
         return (true, path.len());
     }
 
-    let mut find_arr = Vec::new();
+    let mut cur_arr = Vec::new();
     for dir in pos.get_move_dir().iter() {
         let (x, y) = get_dir_pos(pos_wrap.borrow(), dir, map).unwrap();
         if path_has_point(&path, (x, y)) {
             continue;
         }
         let next_pos = map.get_point(x, y).unwrap();
+        cur_arr.push(next_pos);
+    }
+
+    cur_arr.sort_by(|a, b| {
+        let a_space = (end_wrap.borrow().x as i32 - a.borrow().x as i32).abs()
+            + (end_wrap.borrow().y as i32 - a.borrow().y as i32).abs();
+        let b_space = (end_wrap.borrow().x as i32 - b.borrow().x as i32).abs()
+            + (end_wrap.borrow().y as i32 - b.borrow().y as i32).abs();
+
+        a_space.cmp(&b_space)
+    });
+
+    let mut find_arr = Vec::new();
+    for next_pos in cur_arr.iter() {
         let mut clone_path = path.clone();
+        let x = next_pos.borrow().x;
+        let y = next_pos.borrow().y;
 
         clone_path.push((x, y, String::from(&next_pos.borrow().letter)));
-        let (find, step) = find_end_len(next_pos, map, &clone_path);
+        let (find, step) =
+            find_end_len(next_pos, end_wrap, map, map_space, &clone_path);
         if find == true {
             find_arr.push(step)
         }
@@ -161,7 +191,7 @@ fn get_dir_pos(
 }
 
 fn parse_input() -> Map {
-    let content = read_file("day12/demo.txt").unwrap();
+    let content = read_file("day12/input.txt").unwrap();
 
     let map_str = content
         .split("\n")

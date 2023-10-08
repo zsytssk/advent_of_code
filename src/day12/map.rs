@@ -73,14 +73,15 @@ impl Point {
         &self.move_dir
     }
     pub fn can_move(&self, dir: Ref<Point>) -> bool {
-        if self.letter == String::from("S") && dir.letter == String::from("a") {
-            return true;
+        if self.letter == String::from("S") {
+            return dir.letter == String::from("a");
         }
-        if self.letter == String::from("z") && dir.letter == String::from("E") {
-            return true;
+        if dir.letter == String::from("E") {
+            return self.letter == String::from("z");
         }
-        let self_char = self.letter.chars().nth(0).unwrap() as u8;
-        let dir_char = dir.letter.chars().nth(0).unwrap() as u8;
+
+        let self_char = self.letter.chars().nth(0).unwrap() as i32;
+        let dir_char = dir.letter.chars().nth(0).unwrap() as i32;
         if dir_char - self_char <= 1 {
             return true;
         }
