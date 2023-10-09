@@ -29,7 +29,6 @@ impl Token {
     }
 }
 
-// #[derive(Debug)]
 pub enum ListItem {
     Num(i32),
     List(Vec<ListItem>),
@@ -37,7 +36,6 @@ pub enum ListItem {
 
 impl fmt::Debug for ListItem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // Implement how you want to format your struct for debugging
         match &self {
             ListItem::Num(x) => write!(f, "{}", x),
             ListItem::List(arr) => {
@@ -46,7 +44,6 @@ impl fmt::Debug for ListItem {
                     list.push(format!("{:?}", item));
                 }
 
-                // write!(f, "{}{}{}", "[", list.join(","), "]")
                 write!(f, "{}{}{}", "[", list.join(","), "]")
             }
         }

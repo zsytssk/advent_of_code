@@ -9,6 +9,7 @@ https://song.xlog.app/aoc-zh
 - @ques parse_tokens 有没有更好的写法, 下面都是凑出来
   - +1 实在是太 low 了
   - arr.remove(0)
+  - peek + take_while 我可以自己写一个软件
 
 ## 2023-10-07 19:06:10
 

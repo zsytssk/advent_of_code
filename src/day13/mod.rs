@@ -15,13 +15,11 @@ fn parse1() {
     let arr = parse_input();
     let mut right_arr = Vec::new();
     for (index, (top, bottom)) in arr.iter().enumerate() {
-        // let res = top.comp(&bottom);
         if top <= bottom {
             right_arr.push(index + 1);
         }
     }
     println!("res:{:?}", right_arr.iter().sum::<usize>());
-    // println!("res:{:?}", right_arr);
 }
 
 fn parse2() {
@@ -71,9 +69,9 @@ pub fn parse_line(str: &str) -> ListItem {
         local_str = &local_str[len..local_str.len()];
         tokens.push(token);
     }
-    let (_, arr) = parse_tokens(0, &tokens);
+    let (_, list_arr) = parse_tokens(0, &tokens);
 
-    match arr {
+    match list_arr {
         ListItem::List(mut arr) => arr.remove(0),
         _ => panic!("parse error"),
     }
@@ -107,10 +105,6 @@ pub fn parse_tokens(
 
         index += 1;
     }
-    // if (vec.len() == 1) {
-    //     return (index, vec.remove(0));
-    // }
-
     (index, ListItem::List(vec))
 }
 
