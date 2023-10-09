@@ -1,21 +1,52 @@
 #![allow(unused)]
+use std::cmp::Ordering;
+
 use crate::utils::read_file;
 
 mod list;
 use list::*;
 
 pub fn parse() {
-    parse1();
-    // parse2();
+    // parse1();
+    parse2();
 }
 
 fn parse1() {
-    let content = parse_input();
-    println!("{:?}", content);
+    let arr = parse_input();
+    let mut right_arr = Vec::new();
+    for (index, (top, bottom)) in arr.iter().enumerate() {
+        // let res = top.comp(&bottom);
+        if top <= bottom {
+            right_arr.push(index + 1);
+        }
+    }
+    println!("res:{:?}", right_arr.iter().sum::<usize>());
+    // println!("res:{:?}", right_arr);
+}
+
+fn parse2() {
+    let arr = parse_input();
+    let mark1 = ListItem::List(vec![ListItem::List(vec![ListItem::Num(2)])]);
+    let mark2 = ListItem::List(vec![ListItem::List(vec![ListItem::Num(6)])]);
+    let mut right_arr = vec![&mark1, &mark2];
+    for (top, bottom) in arr.iter() {
+        right_arr.push(top);
+        right_arr.push(bottom);
+    }
+    right_arr.sort();
+
+    let mark1_index = right_arr.iter().position(|&x| x == &mark1).unwrap();
+    let mark2_index = right_arr.iter().position(|&x| x == &mark2).unwrap();
+
+    println!(
+        "mark1_index:{:?} mark2_index:{:?}",
+        mark1_index, mark2_index
+    );
+    println!("res:{:?}", (mark1_index + 1) * (mark2_index + 1));
 }
 
 fn parse_input() -> Vec<(ListItem, ListItem)> {
-    let content = read_file("day13/demo.txt").unwrap();
+    let content = read_file("day13/input.txt").unwrap();
 
     content
         .split("\n\n")
@@ -42,7 +73,10 @@ pub fn parse_line(str: &str) -> ListItem {
     }
     let (_, arr) = parse_tokens(0, &tokens);
 
-    arr
+    match arr {
+        ListItem::List(mut arr) => arr.remove(0),
+        _ => panic!("parse error"),
+    }
 }
 
 pub fn parse_tokens(
@@ -73,6 +107,9 @@ pub fn parse_tokens(
 
         index += 1;
     }
+    // if (vec.len() == 1) {
+    //     return (index, vec.remove(0));
+    // }
 
     (index, ListItem::List(vec))
 }
@@ -98,7 +135,7 @@ pub fn peek(str: &str) -> (usize, Token) {
         }
         let token = Token::new(c);
         match token {
-            Token::Num(n) => num = format!("{}{}", n, num),
+            Token::Num(n) => num = format!("{}{}", num, n),
             _ => break,
         }
     }

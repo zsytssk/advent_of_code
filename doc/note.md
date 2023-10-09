@@ -4,6 +4,12 @@ ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
+## day13
+
+- @ques parse_tokens 有没有更好的写法, 下面都是凑出来
+  - +1 实在是太 low 了
+  - arr.remove(0)
+
 ## 2023-10-07 19:06:10
 
 - @ques 如何优化内存
