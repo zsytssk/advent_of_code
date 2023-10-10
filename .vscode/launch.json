@@ -1,0 +1,41 @@
+{
+  // 使用 IntelliSense 了解相关属性。
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'advent_of_code'",
+      "cargo": {
+        "args": ["build", "--bin=advent_of_code", "--package=advent_of_code"],
+        "filter": {
+          "name": "advent_of_code",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'advent_of_code'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=advent_of_code",
+          "--package=advent_of_code"
+        ],
+        "filter": {
+          "name": "advent_of_code",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

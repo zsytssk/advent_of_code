@@ -4,6 +4,12 @@ ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
+## day14
+
+- @ques get_next_pos = [down, left, right]..
+
+- `map.add_bottom(200);` 写死了
+
 ## day13
 
 - @ques parse_tokens 有没有更好的写法, 下面都是凑出来
