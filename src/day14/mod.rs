@@ -6,8 +6,8 @@ use map::*;
 
 // 要先画一个map
 pub fn parse() {
-    // parse1();
-    parse2();
+    parse1();
+    // parse2();
 }
 
 fn parse1() {
@@ -104,7 +104,7 @@ fn parse2() {
 }
 
 fn parse_input() -> Map {
-    let content = read_file("day14/input.txt").unwrap();
+    let content = read_file("day14/demo.txt").unwrap();
 
     let paths = content
         .split("\n")
