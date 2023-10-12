@@ -4,28 +4,17 @@ use std::{
 };
 
 pub struct Map {
-    pub range_x: (i32, i32),
-    pub range_y: (i32, i32),
     pub sensor_and_bean: Vec<((i32, i32), (i32, i32))>,
 }
 
 impl Map {
-    pub fn new(range: ((i32, i32), (i32, i32))) -> Self {
-        Map {
-            range_x: range.0,
-            range_y: range.1,
-            sensor_and_bean: Vec::new(),
-        }
-    }
-    pub fn get_line_y(line_index: i32) -> i32 {
-        todo!()
-    }
-
-    pub fn set_sensor_and_bean(&mut self, info: Vec<(Point, Point)>) {
-        self.sensor_and_bean = info
+    pub fn new(info: Vec<(Point, Point)>) -> Self {
+        let sensor_and_bean = info
             .iter()
             .map(|item| ((item.0.x, item.0.y), (item.1.x, item.1.y)))
             .collect::<Vec<_>>();
+
+        Map { sensor_and_bean }
     }
 }
 

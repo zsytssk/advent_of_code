@@ -110,9 +110,7 @@ fn parse_input() -> Map {
         })
         .collect::<Vec<_>>();
 
-    let range = get_map_range(&info);
-    let mut map = Map::new(range);
-    map.set_sensor_and_bean(info);
+    let mut map = Map::new(info);
     map
 }
 
