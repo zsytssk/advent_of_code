@@ -4,6 +4,10 @@ ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
+## day15
+
+地图太大了如何处理？
+
 ## day14
 
 - @ques get_next_pos = [down, left, right]..

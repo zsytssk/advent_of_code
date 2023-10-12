@@ -1,7 +1,10 @@
-use std::fmt;
+use std::{
+    cell::{RefCell, RefMut},
+    fmt,
+};
 
 pub struct Map {
-    pub points: Vec<Vec<Point>>,
+    pub points: Vec<Vec<RefCell<Point>>>,
     pub range_x: (i32, i32),
     pub range_y: (i32, i32),
     pub sensor_and_bean: Vec<((i32, i32), (i32, i32))>,
@@ -13,7 +16,7 @@ impl Map {
         for y in range.1 .0..=range.1 .1 {
             let mut line = Vec::new();
             for x in range.0 .0..=range.0 .1 {
-                line.push(Point::new(x, y));
+                line.push(RefCell::new(Point::new(x, y)));
             }
             points.push(line);
         }
@@ -24,6 +27,9 @@ impl Map {
             range_y: range.1,
             sensor_and_bean: Vec::new(),
         }
+    }
+    pub fn get_line_y(line_index: i32) -> i32 {
+        todo!()
     }
     pub fn set_sensor_and_bean(&mut self, info: Vec<(Point, Point)>) {
         for item in info.iter() {
@@ -36,7 +42,7 @@ impl Map {
             .map(|item| ((item.0.x, item.0.y), (item.1.x, item.1.y)))
             .collect::<Vec<_>>();
     }
-    pub fn set_point(&mut self, pos: (i32, i32), status: PointStatus) {
+    pub fn set_point(&self, pos: (i32, i32), status: PointStatus) {
         if (pos.0 < self.range_x.0 || pos.0 > self.range_x.1)
             || (pos.1 < self.range_y.0 || pos.1 > self.range_y.1)
         {
@@ -46,9 +52,9 @@ impl Map {
         let x = (pos.0 - self.range_x.0) as usize;
         let y = (pos.1 - self.range_y.0) as usize;
 
-        self.points[y][x].set_status(status);
+        self.points[y][x].borrow_mut().set_status(status);
     }
-    pub fn get_point(&self, pos: (i32, i32)) -> Option<&Point> {
+    pub fn get_point(&self, pos: (i32, i32)) -> Option<RefMut<Point>> {
         if (pos.0 < self.range_x.0 || pos.0 > self.range_x.1)
             || (pos.1 < self.range_y.0 || pos.1 > self.range_y.1)
         {
@@ -58,7 +64,7 @@ impl Map {
         let x = (pos.0 - self.range_x.0) as usize;
         let y = (pos.1 - self.range_y.0) as usize;
 
-        Some(&self.points[y][x])
+        Some(self.points[y][x].borrow_mut())
     }
 }
 
@@ -67,7 +73,7 @@ impl fmt::Debug for Map {
         let mut list = String::from("");
         for line in self.points.iter() {
             for point in line.iter() {
-                list.push_str(&point.to_map_string());
+                list.push_str(&point.borrow().to_map_string());
             }
             list.push_str("\n");
         }
@@ -78,6 +84,7 @@ impl fmt::Debug for Map {
 
 pub enum PointStatus {
     Empty,
+    ConfirmEmpty,
     Sensor,
     Beacon,
 }
@@ -113,12 +120,21 @@ impl Point {
     pub fn to_map_string(&self) -> String {
         let s = match self.status {
             PointStatus::Empty => ".",
+            PointStatus::ConfirmEmpty => "#",
             PointStatus::Sensor => "S",
             PointStatus::Beacon => "B",
         };
         String::from(s)
     }
-    pub fn distance_from_point(&self, point: &Point) -> i32 {
+    pub fn is_not_empty(&self) -> bool {
+        match self.status {
+            PointStatus::Empty => false,
+            PointStatus::ConfirmEmpty => false,
+            PointStatus::Sensor => true,
+            PointStatus::Beacon => true,
+        }
+    }
+    pub fn distance_from_point(&self, point: RefMut<Point>) -> i32 {
         (self.x - point.x).abs() + (self.y - point.y).abs()
     }
     pub fn distance_from_line(&self, line_index: i32) -> i32 {
