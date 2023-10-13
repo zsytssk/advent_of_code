@@ -1,6 +1,10 @@
 #![allow(unused)]
 use crate::utils::read_file;
 
+mod value;
+
+use value::*;
+
 pub fn parse() {
     parse1();
     // parse2();
@@ -8,11 +12,11 @@ pub fn parse() {
 
 fn parse1() {
     let content = parse_input();
-    println!("{}", content);
+    println!("{:?}", content);
 }
 
-fn parse_input() -> String {
+fn parse_input() -> Vec<Value> {
     let content = read_file("day16/demo.txt").unwrap();
 
-    content
+    content.split("\n").map(Value::from_str).collect::<Vec<_>>()
 }
