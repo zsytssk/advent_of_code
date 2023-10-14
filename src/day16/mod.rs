@@ -12,7 +12,7 @@ mod value;
 
 use value::*;
 
-type PathMap = HashMap<String, (usize, usize)>;
+type PathMap = HashMap<String, (usize, i32)>;
 
 pub fn parse() {
     parse1();
@@ -43,42 +43,37 @@ fn find_path<'a>(
         Some(info) => info.clone(),
         None => return,
     };
+    println!("cur_path={:?} | cur_info={:?}", cur_path, cur_info);
 
+    let mut find_deep = false;
     for item in cur_value.to.iter().rev() {
-        match cur_path.find(item) {
-            Some(_) => continue,
-            None => {
-                let value = match map.get_value(&item) {
-                    Some(value) => value,
-                    None => return,
-                };
-
-                let mut cur_score = cur_info.0;
-                let key = format!("{}-{}", cur_path, item);
-                let mut cur_time = cur_info.1 - 1;
-                if cur_time <= 0 {}
-                let rate = value.rate as usize;
-                if rate > 0 {
-                    cur_time -= 1;
-                    cur_score += rate * cur_time;
-                }
-                if cur_time <= 0 {
-                    continue;
-                }
-                path_map.insert(key.clone(), (cur_score, cur_time));
-                find_path(value, map, &key, path_map);
-            }
+        let value = match map.get_value(&item) {
+            Some(value) => value,
+            None => return,
+        };
+        let not_open = match cur_path.find(item) {
+            Some(_) => false,
+            None => true,
+        };
+        let (mut cur_score, mut cur_time) = cur_info.clone();
+        let key = format!("{}-{}", cur_path, item);
+        cur_time -= 1;
+        let rate = value.rate as usize;
+        if rate > 0 && not_open {
+            cur_time -= 1;
+            cur_score += rate * cur_time as usize;
         }
+        if cur_time <= 0 {
+            continue;
+        }
+        find_deep = true;
+        path_map.insert(key.clone(), (cur_score, cur_time));
+        find_path(value, map, &key, path_map);
     }
 
-    // for item in to {
-    //     let next_wrap = map.get_value(item);
-    //     if next_wrap.is_none() {
-    //         continue;
-    //     }
-    //     let next_value = next_wrap.unwrap();
-    //     next_value.rate
-    // }
+    if find_deep {
+        path_map.remove(cur_path);
+    }
 }
 
 fn parse_input() -> Map {
