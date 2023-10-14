@@ -3,6 +3,7 @@ use std::{
     borrow::BorrowMut,
     cell::{Ref, RefCell},
     cmp::Ordering,
+    collections::HashMap,
 };
 
 use crate::utils::read_file;
@@ -10,6 +11,8 @@ use crate::utils::read_file;
 mod value;
 
 use value::*;
+
+type PathMap = HashMap<String, (usize, usize)>;
 
 pub fn parse() {
     parse1();
@@ -22,39 +25,50 @@ fn parse1() {
     if cur_value.is_none() {
         panic!();
     }
-    let path: Vec<String> = Vec::new();
-    let path = find_path(cur_value.unwrap(), &map, path);
+    let cur_path = "AA";
+    let mut path_map: PathMap = HashMap::new();
+    path_map.insert(String::from(cur_path), (0, 30));
+    find_path(cur_value.unwrap(), &map, cur_path, &mut path_map);
 
-    let sum = path.iter().fold(0, |acc, x| {
-        let ele = map.get_value(x).unwrap();
-        acc + ele.rate
-    });
-    println!("sum:{:?}\npath={:?}", sum, path);
+    println!("path_map:{:?}", path_map);
 }
 
 fn find_path<'a>(
     cur_value: Ref<Value>,
     map: &Map,
-    mut path: Vec<String>,
-) -> Vec<String> {
-    let mut arr = cur_value.to.clone();
-    arr.sort_by(|a, b| {
-        let a_next_wrap = map.get_value(a);
-        let b_next_wrap = map.get_value(b);
-        if a_next_wrap.is_none() || b_next_wrap.is_none() {
-            return Ordering::Equal;
-        }
-        let (a_next, b_next) = (a_next_wrap.unwrap(), b_next_wrap.unwrap());
-        a_next.rate.cmp(&b_next.rate)
-    });
+    cur_path: &str,
+    path_map: &mut PathMap,
+) {
+    let cur_info = match path_map.get(cur_path) {
+        Some(info) => info.clone(),
+        None => return,
+    };
 
-    for item in arr.iter().rev() {
-        if path.contains(&item) {
-            continue;
+    for item in cur_value.to.iter().rev() {
+        match cur_path.find(item) {
+            Some(_) => continue,
+            None => {
+                let value = match map.get_value(&item) {
+                    Some(value) => value,
+                    None => return,
+                };
+
+                let mut cur_score = cur_info.0;
+                let key = format!("{}-{}", cur_path, item);
+                let mut cur_time = cur_info.1 - 1;
+                if cur_time <= 0 {}
+                let rate = value.rate as usize;
+                if rate > 0 {
+                    cur_time -= 1;
+                    cur_score += rate * cur_time;
+                }
+                if cur_time <= 0 {
+                    continue;
+                }
+                path_map.insert(key.clone(), (cur_score, cur_time));
+                find_path(value, map, &key, path_map);
+            }
         }
-        path.push(item.clone());
-        let last_ele = map.get_value(&item);
-        path = find_path(last_ele.unwrap(), map, path);
     }
 
     // for item in to {
@@ -65,8 +79,6 @@ fn find_path<'a>(
     //     let next_value = next_wrap.unwrap();
     //     next_value.rate
     // }
-
-    path
 }
 
 fn parse_input() -> Map {

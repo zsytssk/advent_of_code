@@ -16,6 +16,11 @@ https://song.xlog.app/aoc-zh
   - 这需要一个 hashMap
   - 还有三十分钟的限制
 
+```txt
+(size, time)
+DD-EE
+```
+
 ## day15
 
 地图太大了如何处理？
