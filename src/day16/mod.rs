@@ -4,71 +4,150 @@ use std::{
     cell::{Ref, RefCell},
     cmp::Ordering,
     collections::HashMap,
+    fmt,
 };
 
 use crate::utils::read_file;
 
-mod value;
+mod switch;
 
-use value::*;
+use switch::*;
 
-type PathMap = HashMap<String, (usize, i32)>;
+type PathKey = Vec<(String, bool)>;
+
+type PathMap = HashMap<PathKey, (usize, i32)>;
 
 pub fn parse() {
+    // test();
     parse1();
     // parse2();
 }
 
+// fn test() {
+//     let map = parse_input();
+//     // let path = "AA-DD-AA-BB-AA-II-JJ-II-AA-DD-EE-FF-GG-HH-GG-FF-EE-DD-CC";
+//     let path = "AA-DD-CC-BB-AA-II-JJ-II-AA-DD-EE-FF-GG-HH-GG-FF-EE-DD-CC";
+//     let path_arr = path.split("-").collect::<Vec<_>>();
+
+//     let mut pass_path = String::from("");
+//     let mut cur_time = 30;
+//     let mut score = 0 as usize;
+//     for name in path_arr.iter() {
+//         let mut value = map.get_value(name).unwrap();
+
+//         if value.rate > 0 && value.is_open == false {
+//             cur_time -= 1;
+//             score += value.rate as usize * cur_time;
+//             value.set_open(true)
+//         }
+//         println!(
+//             "item={:?}| cur_time={:?} | rate={} | cur_score={:?}",
+//             name, cur_time, value.rate, score
+//         );
+//         cur_time -= 1;
+//         pass_path = format!("{}-{}", pass_path, name);
+//     }
+
+//     println!("score={:?}\npass_path={:?}", score, pass_path)
+// }
+
 fn parse1() {
     let map = parse_input();
-    let cur_value = map.get_value("AA");
-    if cur_value.is_none() {
-        panic!();
-    }
-    let cur_path = "AA";
     let mut path_map: PathMap = HashMap::new();
-    path_map.insert(String::from(cur_path), (0, 30));
-    find_path(cur_value.unwrap(), &map, cur_path, &mut path_map);
+    let first_key = vec![(String::from("AA"), false)];
+    path_map.insert(first_key.clone(), (0, 30));
+    let mut cur_arr = vec![first_key];
 
-    println!("path_map:{:?}", path_map);
+    for i in 0..30 {
+        for cur_path in cur_arr.iter() {
+            find_path(cur_path, &map, &mut path_map, 1);
+        }
+        let path_arr = get_top_path(&path_map);
+        println!(
+            "index={}| key_size={} |path_map:{:?}",
+            i,
+            path_arr.len(),
+            path_arr[0]
+        );
+        cur_arr = path_arr.into_iter().map(|item| item.0).collect();
+    }
+
+    let path_arr = get_top_path(&path_map);
+    println!("path_map:{:?}", path_arr[0]);
 }
 
-fn find_path<'a>(
-    cur_value: Ref<Value>,
-    map: &Map,
-    cur_path: &str,
+fn get_top_path(path_map: &PathMap) -> Vec<(Vec<(String, bool)>, usize)> {
+    let mut vec = path_map.iter().collect::<Vec<_>>();
+    vec.sort_by(|a, b| b.1 .0.cmp(&a.1 .0));
+    vec.iter().map(|item| (item.0.clone(), item.1 .0)).collect()
+}
+
+fn find_path(
+    cur_path: &PathKey,
+    map: &Switches,
     path_map: &mut PathMap,
+    mut time_space: i32,
 ) {
+    if time_space <= 0 {
+        return;
+    }
     let cur_info = match path_map.get(cur_path) {
         Some(info) => info.clone(),
         None => return,
     };
-    println!("cur_path={:?} | cur_info={:?}", cur_path, cur_info);
+
+    if cur_info.1 <= 0 {
+        return;
+    }
+
+    let cur_name = get_last_name(cur_path).unwrap();
+    let cur_value = match map.get_value(&cur_name) {
+        Some(item) => item,
+        None => panic!("cant find item name={}", cur_name),
+    };
+    let mut arr = cur_value
+        .to
+        .iter()
+        .map(|item| {
+            let mut switch = match map.get_refcell(item) {
+                Some(item) => item,
+                None => return None,
+            };
+            let bor_switch = switch.borrow();
+            if bor_switch.rate == 0 || has_opened(&bor_switch.name, cur_path) {
+                return Some(vec![(switch.borrow(), 0)]);
+            }
+            return Some(vec![
+                (switch.borrow(), 0),
+                (switch.borrow(), switch.borrow().rate),
+            ]);
+        })
+        .filter(|item| item.is_some())
+        .map(|item| item.unwrap())
+        .flatten()
+        .collect::<Vec<_>>();
 
     let mut find_deep = false;
-    for item in cur_value.to.iter().rev() {
-        let value = match map.get_value(&item) {
-            Some(value) => value,
-            None => return,
-        };
-        let not_open = match cur_path.find(item) {
-            Some(_) => false,
-            None => true,
-        };
-        let (mut cur_score, mut cur_time) = cur_info.clone();
-        let key = format!("{}-{}", cur_path, item);
+    for item in arr.iter() {
+        let (switcher, rate) = item;
+        let (mut cur_score, mut cur_time) = cur_info;
+        let mut key = cur_path.clone();
+        let opened = *rate != 0;
+
         cur_time -= 1;
-        let rate = value.rate as usize;
-        if rate > 0 && not_open {
+        time_space -= 1;
+        if opened {
             cur_time -= 1;
-            cur_score += rate * cur_time as usize;
+            time_space -= 1;
+            cur_score += *rate as usize * cur_time as usize;
         }
-        if cur_time <= 0 {
+        if cur_time < 0 {
             continue;
         }
         find_deep = true;
+        key.push((switcher.name.clone(), opened));
         path_map.insert(key.clone(), (cur_score, cur_time));
-        find_path(value, map, &key, path_map);
+        find_path(&key, map, path_map, time_space);
     }
 
     if find_deep {
@@ -76,14 +155,27 @@ fn find_path<'a>(
     }
 }
 
-fn parse_input() -> Map {
+fn get_last_name(path: &PathKey) -> Option<String> {
+    match path.iter().last() {
+        Some(item) => Some(item.0.clone()),
+        None => None,
+    }
+}
+fn has_opened(name: &String, path: &PathKey) -> bool {
+    match path.iter().find(|item| &item.0 == name && item.1) {
+        Some(_) => true,
+        None => false,
+    }
+}
+
+fn parse_input() -> Switches {
     let content = read_file("day16/demo.txt").unwrap();
 
     let list = content
         .split("\n")
-        .map(Value::from_str)
+        .map(Switch::from_str)
         .map(|item| RefCell::new(item))
         .collect::<Vec<_>>();
 
-    Map::new(list)
+    Switches::new(list)
 }

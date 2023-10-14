@@ -4,13 +4,58 @@ ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
-## day16
+## day16（难）
+
+- @ques 如果换成不同的算法得出的结果不一样，那就说明遍历 没有完全
+
+- @ques 为什么不同的逻辑 时间差别这么多？
+
+- @ques `time_space` 能不能删除
+- @todo `impl PathKey Debug` -> 需要包一层
+
+- @ques `let mut arr = cur_value` 能不能用 borrow
+
+- PathKey + PathMap 可以写成一个 struct
+
+- @ques 能不能转换成一个简单的问题？
+
+- @ques 怎么把这两种可能都加进去
+
+  - 直接用 loop，这样就不用在 for 循环中瞎搞了
+
+- @ques 跑过去但是不 open
+
+  - 这。。。我可如何处理？
+  - 我怎么计算这种情况 -> 可能性又变大了
+  - 暴力计算？ -> 两种情况都计算进去
+    - path_map 现在这样已经不行了
+    - 会不会 出现 `2*n` 次方 导致卡住？
+
+- @ques hash_map 如何区分两者的不同
+
+- @todo
+
+  - test 计算分数 -> 是不是我计算的有问题
+
+- @ques 在 foreach 中将不需要的去掉？
+
+- @ques 感觉这样计算快了很多 这是为啥？
 
 - @ques 穷举所有的可能，然后计算所有的结果，求出最大的值
 
 - @ques 回退如何处理？
 
   - 存不存在，如果存在怎么处理
+
+- @ques 如果每次跑一 munite 怎么样
+
+- @ques 寻路的优先级如何处理？-> 看看前面寻路是怎么做的
+
+  - 先比较 time，再比较 rate
+  - 比较重复的次数
+  - ?
+
+- @ques for 循环不停的去找，按照优先级排序
 
 - @ques 能不能像寻路一样同时找几个，然后不停的累积数字，最后求出最大的一个
   - 这需要一个 hashMap
@@ -20,6 +65,14 @@ https://song.xlog.app/aoc-zh
 (size, time)
 DD-EE
 ```
+
+-> 可以把寻路算法优化下 day12
+
+-> 开始的时候 AA 算不算 time
+
+- @ques 如果有一个完美的算法 那在 `find_path` 中的 sort 还有必要吗？
+
+- @opt clone 的地方太多了
 
 ## day15
 
