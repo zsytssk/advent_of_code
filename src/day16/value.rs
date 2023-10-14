@@ -1,8 +1,30 @@
+use std::cell::{Ref, RefCell};
+
+#[derive(Debug)]
+pub struct Map {
+    list: Vec<RefCell<Value>>,
+}
+
+impl Map {
+    pub fn new(list: Vec<RefCell<Value>>) -> Self {
+        Map { list }
+    }
+    pub fn get_value(&self, name: &str) -> Option<Ref<Value>> {
+        for item in self.list.iter() {
+            if item.borrow().name == *name {
+                return Some(item.borrow());
+            }
+        }
+
+        None
+    }
+}
+
 #[derive(Debug)]
 pub struct Value {
-    name: String,
-    rate: u8,
-    to: Vec<String>,
+    pub name: String,
+    pub rate: u8,
+    pub to: Vec<String>,
 }
 
 impl Value {
