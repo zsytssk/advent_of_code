@@ -29,7 +29,7 @@ fn parse1() {
     loop {
         i += 1;
         for cur_path in cur_arr.iter() {
-            find_path(cur_path, &map, &mut path_map, 1);
+            find_path(cur_path, &map, &mut path_map, 5);
         }
         let path_arr = get_top_path(&mut path_map, &map);
         if path_arr.len() == 0 {
