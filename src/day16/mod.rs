@@ -36,7 +36,7 @@ fn parse1() {
     loop {
         i += 1;
         for cur_path in cur_arr.iter() {
-            find_path(cur_path, &map, &mut path_map, 5);
+            find_path(cur_path, &map, &mut path_map, 2);
         }
         let path_arr = get_top_path(&mut path_map, &map);
         if path_arr.len() == 0 {
@@ -184,8 +184,8 @@ fn find_path(
         .map(|item| item.unwrap())
         .flatten()
         .collect::<Vec<_>>();
-
-    arr.sort_by(|a, b| b.2.cmp(&a.2));
+    // 将分数高的放在前面 -> 有我的get_top_path 就不需要了
+    // arr.sort_by(|a, b| b.2.cmp(&a.2));
 
     let mut find_deep = false;
     for item in arr.iter() {
