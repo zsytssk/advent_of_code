@@ -17,8 +17,8 @@ type PathKey = Vec<(String, bool)>;
 type PathMap = HashMap<PathKey, (usize, i32)>;
 
 pub fn parse() {
-    // test();
-    parse1();
+    test();
+    // parse1();
     // parse2();
 }
 
