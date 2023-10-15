@@ -26,14 +26,17 @@ pub fn test_path_score(path_arr: PathKey) {
     // let path_arr = str_arr_to_path(TEST2.to_vec());
 
     let mut pass_path = String::from("");
-    let mut cur_time = 30;
+    let mut cur_time = 30 as i32;
     let mut score = 0 as usize;
     for item in path_arr.iter() {
+        if cur_time <= 0 {
+            break;
+        }
         let (name, is_open) = item;
         let mut value = map.get_value(name).unwrap();
         if *is_open {
             cur_time -= 1;
-            score += value.rate as usize * cur_time;
+            score += value.rate as usize * cur_time as usize;
         }
 
         cur_time -= 1;

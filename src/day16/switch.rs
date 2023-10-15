@@ -2,7 +2,7 @@ use std::cell::{Ref, RefCell, RefMut};
 
 #[derive(Debug)]
 pub struct Switches {
-    list: Vec<RefCell<Switch>>,
+    pub list: Vec<RefCell<Switch>>,
 }
 
 impl Switches {

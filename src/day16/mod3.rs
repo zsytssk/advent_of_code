@@ -34,28 +34,25 @@ fn parse1() {
 
     let mut i = 0;
     loop {
+        if cur_arr.len() == 0 {
+            return;
+        }
         i += 1;
         for cur_path in cur_arr.iter() {
-            find_path(cur_path, &map, &mut path_map, 5);
+            find_path(cur_path, &map, &mut path_map, 3);
         }
         let path_arr = get_top_path(&mut path_map, &map);
-        if path_arr.len() == 0 {
-            break;
-        }
-
         println!(
-            "index={}| key_size={} | top_path_score={:?}| top_path_time={:?}\ntop_path:{:?}",
+            "index={}| key_size={} | top_path_score={:?}\ntop_path:{:?}",
             i,
             path_arr.len(),
             path_arr[0].1,
-            path_arr[0].2,
             format_path(&path_arr[0].0),
         );
         cur_arr = path_arr.into_iter().map(|item| item.0).collect();
     }
 
     let path_arr = get_top_path1(&path_map);
-
     println!(
         "cost_time={:?}\nscore={:?}|cur_time={}\npath:{:?}",
         now.elapsed(),
@@ -84,7 +81,7 @@ fn get_top_path(
                 .map(|item| item.0.clone())
                 .collect::<Vec<_>>();
 
-            let mut un_open_path = map
+            let mut all_path = map
                 .list
                 .iter()
                 .filter(|item| {
@@ -99,16 +96,11 @@ fn get_top_path(
                 .map(|item| item.borrow().rate)
                 .collect::<Vec<_>>();
 
-            if un_open_path.len() == 0 {
-                return false;
-            }
-
-            let mut local_big_num = calc_big_num(un_open_path, time.clone());
-            local_big_num += score;
+            let mut big_num = calc_big_num(all_path, time.clone());
+            big_num += score;
             // 没有可能 大于目前最大值的 就不用去处理了
-            if local_big_num < big_num {
-                // println!("remove_item:{}|{}|{}", score, time, big_num);
-                // path_map.remove(*path);
+            if big_num < big_num {
+                println!("remove_item:{}|{}|{}", score, time, big_num);
                 return false;
             }
             true
@@ -139,6 +131,10 @@ fn find_path(
         Some(info) => info.clone(),
         None => return,
     };
+
+    if cur_info.1 <= 0 {
+        return;
+    }
 
     let last_ele = match cur_path.iter().last() {
         Some(item) => item,
@@ -193,29 +189,25 @@ fn find_path(
     let mut find_deep = false;
     for item in arr.iter() {
         let (switcher, rate, _, _) = item;
-        let (cur_score, mut cur_time) = cur_info;
+        let (mut cur_score, mut cur_time) = cur_info;
         let mut key = cur_path.clone();
         let opened = *rate != 0;
 
         let mut local_space = cur_space;
         cur_time -= 1;
         local_space -= 1;
-        let mut new_core = cur_score;
         if opened {
             cur_time -= 1;
             local_space -= 1;
-            new_core += *rate as usize * cur_time as usize;
+            cur_score += *rate as usize * cur_time as usize;
         }
 
-        if cur_time <= 0 {
-            find_deep = true;
-            key.push((switcher.name.clone(), opened));
-            path_map.insert(key.clone(), (cur_score, 0));
+        if cur_time < 0 {
             continue;
         }
         find_deep = true;
         key.push((switcher.name.clone(), opened));
-        path_map.insert(key.clone(), (new_core, cur_time));
+        path_map.insert(key.clone(), (cur_score, cur_time));
         find_path(&key, map, path_map, local_space);
     }
 
@@ -291,7 +283,7 @@ mod tests {
     }
     #[test]
     fn test_path_score() {
-        let path = test::str_to_path("AA-false|DD-true|CC-false|BB-true|AA-false|II-false|JJ-true|II-false|AA-false|DD-false|EE-false|FF-false|GG-false|HH-true|GG-false|FF-false|EE-true|DD-false|CC-true|DD-false|CC-false|BB-false|CC-false|BB-false|CC-false");
+        let path = test::str_to_path("AA-false|DD-true|AA-false|II-false|JJ-true|II-false|AA-false|BB-true|CC-true|DD-false|EE-true|FF-false|GG-false|HH-true");
         test::test_path_score(path);
     }
     #[test]

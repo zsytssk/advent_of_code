@@ -11,11 +11,15 @@ https://song.xlog.app/aoc-zh
 - @todo
 
   - 每次只走取最大
-  - key -> string
   - 排除掉分数最小的
+  - key -> string
   - ***
   - 每次走 5 格
   - 不走回头路
+
+- @ques 有没有可能找到最高的 rate，按顺序排列 一个个
+
+- @ques 如果把所有的可能都跑完会怎样？
 
 - @ques 为什么 `0..6 - 5` 没有跑满
 
