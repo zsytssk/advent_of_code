@@ -1,4 +1,4 @@
-use super::{has_pass_path, parse_input, PathKey};
+use super::{parse_input, PathKey};
 
 // static TEST1: &str  = "AA-false|II-false|JJ-true|II-false|AA-false|BB-true|CC-false|DD-true|EE-true|FF-false|GG-false|HH-true";
 // static TEST1: &str  = "AA-false|DD-true|CC-false|BB-true|AA-false|II-false|JJ-true|II-false|AA-false|DD-false|EE-false|FF-false|GG-false|HH-true|GG-false|FF-false|EE-true|DD-false|CC-true";
@@ -46,18 +46,6 @@ pub fn test_path_score(path_arr: PathKey) {
     println!("score={:?}", score)
 }
 
-pub fn test_pass_path() {
-    let path_arr = str_to_path(
-        "AA-false|DD-true|AA-false|DD-false|CC-true|BB-true|CC-false|DD-false",
-    );
-
-    let res = has_pass_path(
-        [(String::from("CC"), false), (String::from("DD"), false)],
-        &path_arr,
-    );
-
-    println!("{}", res);
-}
 pub fn get_remain_switch(path_arr: PathKey) {
     let map = parse_input();
 }
