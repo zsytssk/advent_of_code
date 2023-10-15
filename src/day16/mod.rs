@@ -58,9 +58,9 @@ fn parse1() {
     path_map.insert(first_key.clone(), (0, 30));
     let mut cur_arr = vec![first_key];
 
-    for i in 0..30 {
+    for i in 0..6 {
         for cur_path in cur_arr.iter() {
-            find_path(cur_path, &map, &mut path_map, 1);
+            find_path(cur_path, &map, &mut path_map, 5);
         }
         let path_arr = get_top_path(&path_map);
         println!(
