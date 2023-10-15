@@ -58,6 +58,9 @@ pub fn test_pass_path() {
 
     println!("{}", res);
 }
+pub fn get_remain_switch(path_arr: PathKey) {
+    let map = parse_input();
+}
 
 pub fn str_arr_to_path(raw_path: Vec<(&str, bool)>) -> PathKey {
     return raw_path

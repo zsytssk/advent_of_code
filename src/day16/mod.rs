@@ -44,7 +44,7 @@ fn parse1() {
         }
 
         println!(
-            "index={}| key_size={} | top_path_score={:?}| top_path_time={:?}\ntop_path:{:?}",
+            "index={} | key_size={} | top_path_score={:?} | top_path_time={:?}\ntop_path:{:?}",
             i,
             path_arr.len(),
             path_arr[0].1,
@@ -75,7 +75,8 @@ fn get_top_path(
 
     let big_num = vec[0].1 .0;
 
-    vec.iter()
+    let mut arr = vec
+        .into_iter()
         .filter(|item| {
             let (path, (score, time)) = item;
             let opened_arr = path
@@ -115,7 +116,17 @@ fn get_top_path(
         })
         .filter(|item| item.1 .1 > 0)
         .map(|item| (item.0.clone(), item.1 .0, item.1 .1))
-        .collect()
+        .collect::<Vec<_>>();
+
+    if arr.len() == 0 {
+        return arr;
+    }
+
+    arr.sort_by(|a, b| b.1.cmp(&a.1));
+
+    let big_num = arr[0].1;
+
+    arr.into_iter().filter(|item| item.1 == big_num).collect()
 }
 
 fn get_top_path1(path_map: &PathMap) -> Vec<(Vec<(String, bool)>, usize, i32)> {
@@ -185,7 +196,7 @@ fn find_path(
         .filter(|item| item.is_some())
         .map(|item| item.unwrap())
         .flatten()
-        .filter(|item| !item.3)
+        // .filter(|item| !item.3)
         .collect::<Vec<_>>();
 
     arr.sort_by(|a, b| b.2.cmp(&a.2));
@@ -269,7 +280,7 @@ fn has_opened(name: &String, path: &PathKey) -> bool {
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/demo.txt").unwrap();
+    let content = read_file("day16/input.txt").unwrap();
 
     let list = content
         .split("\n")
@@ -290,8 +301,13 @@ mod tests {
         test::test_path_score(path);
     }
     #[test]
-    fn test_path_score() {
+    fn test_demo_path_score() {
         let path = test::str_to_path("AA-false|DD-true|CC-false|BB-true|AA-false|II-false|JJ-true|II-false|AA-false|DD-false|EE-false|FF-false|GG-false|HH-true|GG-false|FF-false|EE-true|DD-false|CC-true|DD-false|CC-false|BB-false|CC-false|BB-false|CC-false");
+        test::test_path_score(path);
+    }
+    #[test]
+    fn test_input_path_score() {
+        let path = test::str_to_path("AA-false|WP-false|OB-false|XW-true|AZ-false|AD-true|GW-false|SY-false|LW-true|VF-false|RX-false|CU-true|VA-false|GH-true|PS-false|LU-false|XJ-true|LU-false|PS-false|GH-false|PS-false");
         test::test_path_score(path);
     }
     #[test]
