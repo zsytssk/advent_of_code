@@ -47,6 +47,8 @@ https://song.xlog.app/aoc-zh
 
 ### end
 
+- @ques 为什么每次跑两格结果不对？
+
 - @ques 寻路的优先级如何处理？-> 看看前面寻路是怎么做的
 
   - 先比较 time，再比较 rate

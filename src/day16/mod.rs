@@ -242,7 +242,7 @@ fn has_opened(name: &String, path: &PathKey) -> bool {
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/demo.txt").unwrap();
+    let content = read_file("day16/input.txt").unwrap();
 
     let list = content
         .split("\n")
