@@ -1,12 +1,5 @@
 #![allow(unused)]
-use std::{
-    borrow::BorrowMut,
-    cell::{Ref, RefCell},
-    cmp::Ordering,
-    collections::HashMap,
-    fmt,
-    time::Instant,
-};
+use std::{cell::RefCell, collections::HashMap, time::Instant};
 
 use crate::utils::read_file;
 
