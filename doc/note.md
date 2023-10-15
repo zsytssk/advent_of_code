@@ -6,6 +6,8 @@ https://song.xlog.app/aoc-zh
 
 ## day16（难）
 
+- @ques 每次跑一格..., 在 loop 中 insert
+
 - @ques 怎么最后卡住了， 任务没有结束
 
 - @ques 寻路怎么保证最高优先级的是最快的

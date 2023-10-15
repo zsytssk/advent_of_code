@@ -29,7 +29,7 @@ fn parse1() {
     loop {
         i += 1;
         for cur_path in cur_arr.iter() {
-            find_path(cur_path, &map, &mut path_map, 5);
+            find_path(cur_path, &map, &mut path_map, 1);
         }
         let path_arr = get_top_path(&mut path_map, &map);
         if path_arr.len() == 0 {
@@ -242,7 +242,7 @@ fn has_opened(name: &String, path: &PathKey) -> bool {
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/input.txt").unwrap();
+    let content = read_file("day16/demo.txt").unwrap();
 
     let list = content
         .split("\n")
