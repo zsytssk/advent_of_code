@@ -12,12 +12,12 @@ https://song.xlog.app/aoc-zh
 
 - @todo
 
-  - 将已经结束的小于最大值的全部删除...
-  - 计算 input 在不同的 cur_space 的速度
   - find_path 没有解决一开始进来的问题
+  - 计算 input 在不同的 cur_space 的速度 1 最小...
+  - ***
   - get_top_path 只取一个
   - 将递归去掉...
-  - ***
+  - 将已经结束的小于最大值的全部删除...
   - 将已经计算过的 排除在外 `(Vec<(String, bool)>, usize, i32) 最后一个标识`
   - 删除多余的 key
   - get_top_path 对比 time

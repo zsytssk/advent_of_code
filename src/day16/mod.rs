@@ -32,9 +32,10 @@ fn parse1() {
         for cur_path in cur_arr.iter() {
             find_path(cur_path, &map, &mut loop_path_map);
         }
-        let path_arr =
+        cur_arr =
             calc_top_path(&mut loop_path_map, &mut complete_path_map, &map);
-        if path_arr.len() == 0 {
+
+        if cur_arr.len() == 0 {
             break;
         }
 
@@ -46,7 +47,6 @@ fn parse1() {
         //     path_arr[0].2,
         //     format_path(&path_arr[0].0),
         // );
-        cur_arr = path_arr.into_iter().map(|item| item.0).collect();
     }
 
     let path_arr = get_top_path(&complete_path_map);
@@ -63,7 +63,7 @@ fn calc_top_path(
     loop_path_map: &mut PathMap,
     complete_path_map: &mut PathMap,
     map: &Switches,
-) -> Vec<(Vec<(String, bool)>, usize, i32)> {
+) -> Vec<(Vec<(String, bool)>)> {
     let mut vec = complete_path_map.iter().collect::<Vec<_>>();
     vec.sort_by(|a, b| b.1 .0.cmp(&a.1 .0));
     let big_num = match vec.first() {
@@ -122,7 +122,7 @@ fn calc_top_path(
     });
 
     if arr.len() == 0 {
-        return arr;
+        return vec![];
     }
 
     arr.sort_by(|a, b| {
@@ -144,6 +144,7 @@ fn calc_top_path(
 
     arr.into_iter()
         .filter(|item| item.1 == big_num && item.2 == big_time)
+        .map(|item| item.0)
         .collect()
 }
 
@@ -254,7 +255,7 @@ fn has_opened(name: &String, path: &PathKey) -> bool {
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/demo.txt").unwrap();
+    let content = read_file("day16/input.txt").unwrap();
 
     let list = content
         .split("\n")
