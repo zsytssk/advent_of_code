@@ -30,11 +30,12 @@ fn parse1() {
     loop {
         i += 1;
         for cur_path in cur_arr.iter() {
-            find_path(cur_path, &map, &mut loop_path_map, 1);
+            find_path(cur_path, &map, &mut loop_path_map);
         }
-        let path_arr =
+        cur_arr =
             calc_top_path(&mut loop_path_map, &mut complete_path_map, &map);
-        if path_arr.len() == 0 {
+
+        if cur_arr.len() == 0 {
             break;
         }
 
@@ -46,7 +47,6 @@ fn parse1() {
         //     path_arr[0].2,
         //     format_path(&path_arr[0].0),
         // );
-        cur_arr = path_arr.into_iter().map(|item| item.0).collect();
     }
 
     let path_arr = get_top_path(&complete_path_map);
@@ -63,7 +63,7 @@ fn calc_top_path(
     loop_path_map: &mut PathMap,
     complete_path_map: &mut PathMap,
     map: &Switches,
-) -> Vec<(Vec<(String, bool)>, usize, i32)> {
+) -> Vec<(Vec<(String, bool)>)> {
     let mut vec = complete_path_map.iter().collect::<Vec<_>>();
     vec.sort_by(|a, b| b.1 .0.cmp(&a.1 .0));
     let big_num = match vec.first() {
@@ -122,7 +122,7 @@ fn calc_top_path(
     });
 
     if arr.len() == 0 {
-        return arr;
+        return vec![];
     }
 
     arr.sort_by(|a, b| {
@@ -144,6 +144,7 @@ fn calc_top_path(
 
     arr.into_iter()
         .filter(|item| item.1 == big_num && item.2 == big_time)
+        .map(|item| item.0)
         .collect()
 }
 
@@ -155,15 +156,7 @@ fn get_top_path(path_map: &PathMap) -> Vec<(Vec<(String, bool)>, usize, i32)> {
         .collect()
 }
 
-fn find_path(
-    cur_path: &PathKey,
-    map: &Switches,
-    path_map: &mut PathMap,
-    mut cur_space: i32,
-) {
-    if cur_space < 0 {
-        return;
-    }
+fn find_path(cur_path: &PathKey, map: &Switches, path_map: &mut PathMap) {
     let cur_info = match path_map.get(cur_path) {
         Some(info) => info.clone(),
         None => return,
@@ -213,26 +206,20 @@ fn find_path(
         let mut key = cur_path.clone();
         let opened = *rate != 0;
 
-        let mut local_space = cur_space;
         cur_time -= 1;
-        local_space -= 1;
         let mut new_core = cur_score;
         if opened {
             cur_time -= 1;
-            local_space -= 1;
             new_core += *rate as usize * cur_time as usize;
         }
 
-        if cur_time <= 0 {
-            find_deep = true;
-            key.push((switcher.name.clone(), opened));
-            path_map.insert(key.clone(), (cur_score, 0));
-            continue;
-        }
         find_deep = true;
         key.push((switcher.name.clone(), opened));
-        path_map.insert(key.clone(), (new_core, cur_time));
-        find_path(&key, map, path_map, local_space);
+        if cur_time <= 0 {
+            path_map.insert(key, (cur_score, 0));
+        } else {
+            path_map.insert(key, (new_core, cur_time));
+        }
     }
 
     if find_deep {
