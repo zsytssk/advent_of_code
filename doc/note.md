@@ -6,8 +6,13 @@ https://song.xlog.app/aoc-zh
 
 ## day16（难）
 
+- @ques input 为什么会慢这么多？
+
+  - 内存占用太高 20G
+
 - @todo
 
+  - 将已经结束的小于最大值的全部删除...
   - 计算 input 在不同的 cur_space 的速度
   - find_path 没有解决一开始进来的问题
   - get_top_path 只取一个

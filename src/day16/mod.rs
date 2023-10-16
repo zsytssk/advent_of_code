@@ -30,7 +30,7 @@ fn parse1() {
     loop {
         i += 1;
         for cur_path in cur_arr.iter() {
-            find_path(cur_path, &map, &mut loop_path_map, 5);
+            find_path(cur_path, &map, &mut loop_path_map, 1);
         }
         let path_arr =
             calc_top_path(&mut loop_path_map, &mut complete_path_map, &map);
@@ -70,6 +70,7 @@ fn calc_top_path(
         Some(t) => t.1 .0,
         None => 0,
     };
+    complete_path_map.retain(|path, item| item.0 == big_num);
 
     let mut arr = Vec::new();
     loop_path_map.retain(|path, item| {
@@ -79,6 +80,13 @@ fn calc_top_path(
             .filter(|item| item.1)
             .map(|item| item.0.clone())
             .collect::<Vec<_>>();
+
+        if *time <= 0 {
+            if *score > big_num {
+                complete_path_map.insert(path.clone(), item.clone());
+            }
+            return false;
+        }
 
         let mut un_open_path = map
             .list
@@ -96,7 +104,9 @@ fn calc_top_path(
             .collect::<Vec<_>>();
 
         if un_open_path.len() == 0 {
-            complete_path_map.insert(path.clone(), item.clone());
+            if *score > big_num {
+                complete_path_map.insert(path.clone(), item.clone());
+            }
             return false;
         }
 
@@ -126,7 +136,7 @@ fn calc_top_path(
     let big_num = arr[0].1;
     let big_time = arr[0].2;
     // println!(
-    //     "arr_size:{}|big_num:{}|small_time:{}",
+    //     "arr_size:{}|big_num:{}|big_time:{}",
     //     arr.len(),
     //     big_num,
     //     big_time
@@ -258,7 +268,7 @@ fn has_opened(name: &String, path: &PathKey) -> bool {
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/demo.txt").unwrap();
+    let content = read_file("day16/input.txt").unwrap();
 
     let list = content
         .split("\n")
