@@ -69,6 +69,7 @@ fn get_top_path(
     let big_num = vec[0].1 .0;
 
     let mut arr = Vec::new();
+    let mut delete_keys: Vec<&Vec<(String, bool)>> = Vec::new();
     path_map.retain(|path, item| {
         let (score, time) = item;
         let opened_arr = path
@@ -107,6 +108,10 @@ fn get_top_path(
         return true;
     });
 
+    for item in delete_keys {
+        path_map.remove(item);
+    }
+
     if arr.len() == 0 {
         return arr;
     }
@@ -127,6 +132,8 @@ fn get_top_path(
     //     big_num,
     //     big_time
     // );
+
+    // vec![arr.remove(0)]
 
     arr.into_iter()
         .filter(|item| item.1 == big_num && item.2 == big_time)
@@ -254,7 +261,7 @@ fn has_opened(name: &String, path: &PathKey) -> bool {
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/input.txt").unwrap();
+    let content = read_file("day16/demo.txt").unwrap();
 
     let list = content
         .split("\n")

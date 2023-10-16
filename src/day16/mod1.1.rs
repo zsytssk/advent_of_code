@@ -1,19 +1,12 @@
 #![allow(unused)]
-use std::{
-    borrow::BorrowMut,
-    cell::{Ref, RefCell},
-    cmp::Ordering,
-    collections::HashMap,
-    fmt,
-    time::Instant,
-};
+use std::{cell::RefCell, collections::HashMap, time::Instant};
 
 use crate::utils::read_file;
 
-mod switch;
+mod map;
 mod test;
 
-use switch::*;
+use map::*;
 
 type PathKey = Vec<(String, bool)>;
 
@@ -34,25 +27,28 @@ fn parse1() {
 
     let mut i = 0;
     loop {
-        if cur_arr.len() == 0 {
-            return;
-        }
         i += 1;
         for cur_path in cur_arr.iter() {
-            find_path(cur_path, &map, &mut path_map, 3);
+            find_path(cur_path, &map, &mut path_map, 1);
         }
         let path_arr = get_top_path(&mut path_map, &map);
-        println!(
-            "index={}| key_size={} | top_path_score={:?}\ntop_path:{:?}",
-            i,
-            path_arr.len(),
-            path_arr[0].1,
-            format_path(&path_arr[0].0),
-        );
+        if path_arr.len() == 0 {
+            break;
+        }
+
+        // println!(
+        //     "index={} | key_size={} | top_path_score={:?} | top_path_time={:?}\ntop_path:{:?}",
+        //     i,
+        //     path_arr.len(),
+        //     path_arr[0].1,
+        //     path_arr[0].2,
+        //     format_path(&path_arr[0].0),
+        // );
         cur_arr = path_arr.into_iter().map(|item| item.0).collect();
     }
 
     let path_arr = get_top_path1(&path_map);
+
     println!(
         "cost_time={:?}\nscore={:?}|cur_time={}\npath:{:?}",
         now.elapsed(),
@@ -72,7 +68,14 @@ fn get_top_path(
 
     let big_num = vec[0].1 .0;
 
-    vec.iter()
+    let mut delete_keys: Vec<&Vec<(String, bool)>> = Vec::new();
+    for i in 1..vec.len() {
+        if vec[i].1 .0 == big_num {
+            delete_keys.push(vec[i].0);
+        }
+    }
+    let mut arr = vec
+        .into_iter()
         .filter(|item| {
             let (path, (score, time)) = item;
             let opened_arr = path
@@ -81,7 +84,7 @@ fn get_top_path(
                 .map(|item| item.0.clone())
                 .collect::<Vec<_>>();
 
-            let mut all_path = map
+            let mut un_open_path = map
                 .list
                 .iter()
                 .filter(|item| {
@@ -96,17 +99,54 @@ fn get_top_path(
                 .map(|item| item.borrow().rate)
                 .collect::<Vec<_>>();
 
-            let mut big_num = calc_big_num(all_path, time.clone());
-            big_num += score;
+            if un_open_path.len() == 0 {
+                return false;
+            }
+
+            let mut local_big_num = calc_big_num(un_open_path, time.clone());
+            local_big_num += score;
             // 没有可能 大于目前最大值的 就不用去处理了
-            if big_num < big_num {
-                println!("remove_item:{}|{}|{}", score, time, big_num);
+            if local_big_num < big_num {
+                delete_keys.push(path);
+                // println!("remove_item:{}|{}|{}", score, time, big_num);
+                // path_map.remove(*path);
                 return false;
             }
             true
         })
         .filter(|item| item.1 .1 > 0)
         .map(|item| (item.0.clone(), item.1 .0, item.1 .1))
+        .collect::<Vec<_>>();
+
+    for item in delete_keys {
+        path_map.remove(item);
+    }
+
+    if arr.len() == 0 {
+        return arr;
+    }
+
+    arr.sort_by(|a, b| {
+        let rate_cmp = b.1.cmp(&a.1);
+        if rate_cmp != std::cmp::Ordering::Equal {
+            return rate_cmp;
+        }
+        b.2.cmp(&a.2)
+    });
+
+    let big_num = arr[0].1;
+    let big_time = arr[0].2;
+    println!(
+        "arr_size:{}|big_num:{}|small_time:{}",
+        arr.len(),
+        big_num,
+        big_time
+    );
+
+    // vec![arr.remove(0)]
+
+    arr.into_iter()
+        .filter(|item| item.1 == big_num && item.2 == big_time)
         .collect()
 }
 
@@ -132,10 +172,6 @@ fn find_path(
         None => return,
     };
 
-    if cur_info.1 <= 0 {
-        return;
-    }
-
     let last_ele = match cur_path.iter().last() {
         Some(item) => item,
         None => return,
@@ -157,57 +193,47 @@ fn find_path(
             let bor_switch = switch.borrow();
             let rate = bor_switch.rate;
             if rate == 0 || has_opened(&bor_switch.name, cur_path) {
-                let has_path = has_pass_path(
-                    [last_ele.clone(), (bor_switch.name.clone(), false)],
-                    cur_path,
-                );
-
-                return Some(vec![(switch.borrow(), 0, 0, has_path)]);
+                return Some(vec![(switch.borrow(), 0, 0)]);
             }
-            let opened_has_path = has_pass_path(
-                [last_ele.clone(), (bor_switch.name.clone(), true)],
-                cur_path,
-            );
-            let has_path = has_pass_path(
-                [last_ele.clone(), (bor_switch.name.clone(), false)],
-                cur_path,
-            );
 
             return Some(vec![
-                (switch.borrow(), 0, rate, has_path),
-                (switch.borrow(), rate, rate, opened_has_path),
+                (switch.borrow(), 0, rate),
+                (switch.borrow(), rate, rate),
             ]);
         })
         .filter(|item| item.is_some())
         .map(|item| item.unwrap())
         .flatten()
-        .filter(|item| !item.3)
         .collect::<Vec<_>>();
-
+    // 将分数高的放在前面 -> 有我的get_top_path 就不需要了
     arr.sort_by(|a, b| b.2.cmp(&a.2));
 
     let mut find_deep = false;
     for item in arr.iter() {
-        let (switcher, rate, _, _) = item;
-        let (mut cur_score, mut cur_time) = cur_info;
+        let (switcher, rate, _) = item;
+        let (cur_score, mut cur_time) = cur_info;
         let mut key = cur_path.clone();
         let opened = *rate != 0;
 
         let mut local_space = cur_space;
         cur_time -= 1;
         local_space -= 1;
+        let mut new_core = cur_score;
         if opened {
             cur_time -= 1;
             local_space -= 1;
-            cur_score += *rate as usize * cur_time as usize;
+            new_core += *rate as usize * cur_time as usize;
         }
 
-        if cur_time < 0 {
+        if cur_time <= 0 {
+            find_deep = true;
+            key.push((switcher.name.clone(), opened));
+            path_map.insert(key.clone(), (cur_score, 0));
             continue;
         }
         find_deep = true;
         key.push((switcher.name.clone(), opened));
-        path_map.insert(key.clone(), (cur_score, cur_time));
+        path_map.insert(key.clone(), (new_core, cur_time));
         find_path(&key, map, path_map, local_space);
     }
 
@@ -216,8 +242,9 @@ fn find_path(
     }
 }
 
-fn calc_big_num(rate_arr: Vec<u8>, mut time: i32) -> usize {
+fn calc_big_num(mut rate_arr: Vec<u8>, mut time: i32) -> usize {
     let mut all = 0 as usize;
+    rate_arr.sort_by(|a, b| b.cmp(a));
     for item in rate_arr.iter() {
         time -= 2;
         if time <= 0 {
@@ -226,23 +253,6 @@ fn calc_big_num(rate_arr: Vec<u8>, mut time: i32) -> usize {
         all += time as usize * *item as usize;
     }
     all
-}
-
-fn has_pass_path(part_path: [(String, bool); 2], whole_path: &PathKey) -> bool {
-    for (index, item) in whole_path.iter().enumerate() {
-        if item.0 != part_path[0].0 || item.1 != part_path[0].1 {
-            continue;
-        }
-        if index == whole_path.len() - 1 {
-            continue;
-        }
-        let next_item = &whole_path[index + 1];
-        if next_item.0 == part_path[1].0 && next_item.1 == part_path[1].1 {
-            return true;
-        }
-    }
-
-    false
 }
 
 fn format_path(path: &PathKey) -> String {
@@ -261,7 +271,7 @@ fn has_opened(name: &String, path: &PathKey) -> bool {
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/demo.txt").unwrap();
+    let content = read_file("day16/input.txt").unwrap();
 
     let list = content
         .split("\n")
@@ -282,12 +292,13 @@ mod tests {
         test::test_path_score(path);
     }
     #[test]
-    fn test_path_score() {
-        let path = test::str_to_path("AA-false|DD-true|AA-false|II-false|JJ-true|II-false|AA-false|BB-true|CC-true|DD-false|EE-true|FF-false|GG-false|HH-true");
+    fn test_demo_path_score() {
+        let path = test::str_to_path("AA-false|DD-true|AA-false|BB-true|AA-false|II-false|JJ-true|II-false|AA-false|DD-false|EE-true|FF-false|GG-false|HH-true|GG-false|FF-false|EE-false|DD-false|CC-true");
         test::test_path_score(path);
     }
     #[test]
-    fn test_pass_path() {
-        test::test_pass_path();
+    fn test_input_path_score() {
+        let path = test::str_to_path("AA-false|WP-false|OB-false|XW-true|AZ-false|AD-true|GW-false|SY-false|LW-true|VF-false|RX-false|CU-true|VA-false|GH-true|PS-false|LU-false|XJ-true|LU-false|PS-false|GH-false|PS-false");
+        test::test_path_score(path);
     }
 }

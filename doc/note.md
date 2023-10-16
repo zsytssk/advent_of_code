@@ -6,6 +6,18 @@ https://song.xlog.app/aoc-zh
 
 ## day16（难）
 
+- @todo
+
+  - 将已经计算过的 排除在外 `(Vec<(String, bool)>, usize, i32) 最后一个标识`
+  - find_path 没有解决一开始进来的问题
+  - get_top_path 只取一个
+  - 将递归去掉...
+  - ***
+  - 删除多余的 key
+  - get_top_path 对比 time
+
+- @ques input 好像进入了死循环一样
+
 - @ques 每次跑一格..., 在 loop 中 insert
 
 - @ques 怎么最后卡住了， 任务没有结束
