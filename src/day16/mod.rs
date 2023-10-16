@@ -20,18 +20,20 @@ pub fn parse() {
 fn parse1() {
     let now = Instant::now();
     let map = parse_input();
-    let mut path_map: PathMap = HashMap::new();
+    let mut complete_path_map: PathMap = HashMap::new();
+    let mut loop_path_map: PathMap = HashMap::new();
     let first_key = vec![(String::from("AA"), false)];
-    path_map.insert(first_key.clone(), (0, 30));
+    loop_path_map.insert(first_key.clone(), (0, 30));
     let mut cur_arr = vec![first_key];
 
     let mut i = 0;
     loop {
         i += 1;
         for cur_path in cur_arr.iter() {
-            find_path(cur_path, &map, &mut path_map, 1);
+            find_path(cur_path, &map, &mut loop_path_map, 5);
         }
-        let path_arr = get_top_path(&mut path_map, &map);
+        let path_arr =
+            calc_top_path(&mut loop_path_map, &mut complete_path_map, &map);
         if path_arr.len() == 0 {
             break;
         }
@@ -47,8 +49,7 @@ fn parse1() {
         cur_arr = path_arr.into_iter().map(|item| item.0).collect();
     }
 
-    let path_arr = get_top_path1(&path_map);
-
+    let path_arr = get_top_path(&complete_path_map);
     println!(
         "cost_time={:?}\nscore={:?}|cur_time={}\npath:{:?}",
         now.elapsed(),
@@ -58,18 +59,20 @@ fn parse1() {
     );
 }
 
-fn get_top_path(
-    path_map: &mut PathMap,
+fn calc_top_path(
+    loop_path_map: &mut PathMap,
+    complete_path_map: &mut PathMap,
     map: &Switches,
 ) -> Vec<(Vec<(String, bool)>, usize, i32)> {
-    let mut vec = path_map.iter().collect::<Vec<_>>();
-
+    let mut vec = complete_path_map.iter().collect::<Vec<_>>();
     vec.sort_by(|a, b| b.1 .0.cmp(&a.1 .0));
-
-    let big_num = vec[0].1 .0;
+    let big_num = match vec.first() {
+        Some(t) => t.1 .0,
+        None => 0,
+    };
 
     let mut arr = Vec::new();
-    path_map.retain(|path, item| {
+    loop_path_map.retain(|path, item| {
         let (score, time) = item;
         let opened_arr = path
             .iter()
@@ -93,7 +96,8 @@ fn get_top_path(
             .collect::<Vec<_>>();
 
         if un_open_path.len() == 0 {
-            return true;
+            complete_path_map.insert(path.clone(), item.clone());
+            return false;
         }
 
         let mut local_big_num = calc_big_num(un_open_path, time.clone());
@@ -133,7 +137,7 @@ fn get_top_path(
         .collect()
 }
 
-fn get_top_path1(path_map: &PathMap) -> Vec<(Vec<(String, bool)>, usize, i32)> {
+fn get_top_path(path_map: &PathMap) -> Vec<(Vec<(String, bool)>, usize, i32)> {
     let mut vec = path_map.iter().collect::<Vec<_>>();
     vec.sort_by(|a, b| b.1 .0.cmp(&a.1 .0));
     vec.iter()
@@ -254,7 +258,7 @@ fn has_opened(name: &String, path: &PathKey) -> bool {
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/input.txt").unwrap();
+    let content = read_file("day16/demo.txt").unwrap();
 
     let list = content
         .split("\n")
