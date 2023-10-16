@@ -13,6 +13,8 @@ https://song.xlog.app/aoc-zh
 - @todo
 
   - find_path 没有解决一开始进来的问题
+    - cur_time 多算了
+    - 好像也没有什么问题
   - 计算 input 在不同的 cur_space 的速度 1 最小...
   - ***
   - get_top_path 只取一个
