@@ -30,7 +30,7 @@ fn parse1() {
     loop {
         i += 1;
         for cur_path in cur_arr.iter() {
-            find_path(cur_path, &map, &mut loop_path_map, 1);
+            find_path(cur_path, &map, &mut loop_path_map);
         }
         let path_arr =
             calc_top_path(&mut loop_path_map, &mut complete_path_map, &map);
@@ -155,15 +155,7 @@ fn get_top_path(path_map: &PathMap) -> Vec<(Vec<(String, bool)>, usize, i32)> {
         .collect()
 }
 
-fn find_path(
-    cur_path: &PathKey,
-    map: &Switches,
-    path_map: &mut PathMap,
-    mut cur_space: i32,
-) {
-    if cur_space < 0 {
-        return;
-    }
+fn find_path(cur_path: &PathKey, map: &Switches, path_map: &mut PathMap) {
     let cur_info = match path_map.get(cur_path) {
         Some(info) => info.clone(),
         None => return,
@@ -212,26 +204,20 @@ fn find_path(
         let mut key = cur_path.clone();
         let opened = *rate != 0;
 
-        let mut local_space = cur_space;
         cur_time -= 1;
-        local_space -= 1;
         let mut new_core = cur_score;
         if opened {
             cur_time -= 1;
-            local_space -= 1;
             new_core += *rate as usize * cur_time as usize;
         }
 
-        if cur_time <= 0 {
-            find_deep = true;
-            key.push((switcher.name.clone(), opened));
-            path_map.insert(key.clone(), (cur_score, 0));
-            continue;
-        }
         find_deep = true;
         key.push((switcher.name.clone(), opened));
-        path_map.insert(key.clone(), (new_core, cur_time));
-        find_path(&key, map, path_map, local_space);
+        if cur_time <= 0 {
+            path_map.insert(key, (cur_score, 0));
+        } else {
+            path_map.insert(key, (new_core, cur_time));
+        }
     }
 
     if find_deep {
@@ -268,7 +254,7 @@ fn has_opened(name: &String, path: &PathKey) -> bool {
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/input.txt").unwrap();
+    let content = read_file("day16/demo.txt").unwrap();
 
     let list = content
         .split("\n")
