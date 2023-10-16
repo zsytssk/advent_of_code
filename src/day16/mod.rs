@@ -135,12 +135,12 @@ fn calc_top_path(
 
     let big_num = arr[0].1;
     let big_time = arr[0].2;
-    // println!(
-    //     "arr_size:{}|big_num:{}|big_time:{}",
-    //     arr.len(),
-    //     big_num,
-    //     big_time
-    // );
+    println!(
+        "arr_size:{}|big_num:{}|big_time:{}",
+        arr.len(),
+        big_num,
+        big_time
+    );
 
     arr.into_iter()
         .filter(|item| item.1 == big_num && item.2 == big_time)
@@ -202,8 +202,9 @@ fn find_path(
         .map(|item| item.unwrap())
         .flatten()
         .collect::<Vec<_>>();
+
     // 将分数高的放在前面 -> 有我的get_top_path 就不需要了
-    arr.sort_by(|a, b| b.2.cmp(&a.2));
+    // arr.sort_by(|a, b| b.2.cmp(&a.2));
 
     let mut find_deep = false;
     for item in arr.iter() {
