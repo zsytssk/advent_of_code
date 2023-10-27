@@ -10,6 +10,8 @@ https://song.xlog.app/aoc-zh
 
 - @ques 如何 loop_key
 
+- @ques 便利数组
+
 ### end
 
 - @todo

@@ -22,20 +22,16 @@ pub fn parse() {
 fn parse1() {
     let now = Instant::now();
     let map = parse_input();
-    let path_arr = map
-        .list
-        .iter()
-        .filter(|item| item.borrow().rate != 0 || item.borrow().name == "AA")
-        .collect::<Vec<_>>();
+    let path_arr = map.get_rate_keys();
 
     let mut loop_path_map: PathMap = HashMap::new();
     let mut complete_path_map: PathMap = HashMap::new();
     let short_path = get_short_path(&path_arr, &map);
-    let first_key = MapKey::new(vec!["AA".to_string()], 30);
+    let first_key = MapKey::new(vec!["AA".to_string()], 30, path_arr.len());
 
     let mut cur_paths = vec![first_key];
     loop {
-        for path in cur_paths.iter() {
+        for path in cur_paths.iter_mut() {
             let cur_score = match loop_path_map.get(path) {
                 None => 0,
                 Some(t) => t.clone(),
@@ -46,6 +42,8 @@ fn parse1() {
 
             if next_info_list.len() != 0 {
                 loop_path_map.remove(path);
+            } else {
+                path.set_time(0);
             }
             for (next_key, next_score) in next_info_list {
                 loop_path_map.insert(next_key, cur_score + next_score);
@@ -63,10 +61,19 @@ fn calc_top_path(
     map: &Switches,
 ) -> Vec<(Vec<(String, bool)>)> {
     let mut path_arr: Vec<_> = complete_path_map.iter().collect();
-    path_arr.sort_by(|a, b| {
-        a.0
-    })
-    todo!()
+    path_arr.sort_by(|a, b| b.1.cmp(&a.1));
+    let big_num = path_arr[0].1;
+
+    loop_path_map.retain(|key, score| {
+        if key.is_complete() {
+            if *score > *big_num {
+                complete_path_map.insert(key.clone(), *score);
+            }
+            return false;
+        }
+
+        return true;
+    });
 }
 
 fn parse_input() -> Switches {

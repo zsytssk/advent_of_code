@@ -6,17 +6,18 @@ use std::{
 use super::map::{MapKey, Switch, Switches};
 
 pub fn get_short_path(
-    path_arr: &Vec<&RefCell<Switch>>,
+    path_arr: &Vec<Ref<Switch>>,
     map: &Switches,
 ) -> HashMap<(String, String), usize> {
     let mut short_path: HashMap<(String, String), usize> = HashMap::new();
+    let path_arr = map.get_rate_keys();
 
     let big_num = map.list.len();
 
     for i in 0..path_arr.len() {
-        let from = path_arr[i].borrow();
+        let from = path_arr[i];
         for j in 0..path_arr.len() {
-            let to = path_arr[j].borrow();
+            let to = path_arr[j];
             if i == j {
                 continue;
             }
