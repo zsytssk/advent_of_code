@@ -4,13 +4,17 @@ ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
+## 组织语言
+
 ## day16（难）2
+
+- @ques 如何 loop_key
+
+### end
 
 - @todo
   - MapKey
   - complete_path
-
-### end
 
 find_short_path 优化如果已经出现的 map 就直接 return
 

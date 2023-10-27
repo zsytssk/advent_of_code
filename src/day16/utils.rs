@@ -3,7 +3,7 @@ use std::{
     collections::HashMap,
 };
 
-use super::map::{Switch, Switches};
+use super::map::{MapKey, Switch, Switches};
 
 pub fn get_short_path(
     path_arr: &Vec<&RefCell<Switch>>,
