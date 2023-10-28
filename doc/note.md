@@ -4,15 +4,14 @@ ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
-## 组织语言
-
 ## day16（难）2
 
+### end
+
 - @ques 怎麼錯了
+
   - short_path 有問題
   - 計算 rate 有問題
-
-### end
 
 - @ques 如何 loop_key
 

@@ -16,11 +16,55 @@ use map::*;
 type PathMap = HashMap<MapKey, usize>;
 type PathList = Vec<(MapKey, usize, usize)>;
 pub fn parse() {
-    parse1();
-    // parse2();
+    // parse1();
+    parse2();
 }
 
 fn parse1() {
+    let now = Instant::now();
+    let map = parse_input();
+    let path_arr = map.get_rate_keys();
+
+    let mut loop_paths: PathList = vec![];
+    let mut complete_paths: PathList = vec![];
+    let short_path = get_short_path(&path_arr, &map);
+    let first_key = MapKey::new(vec!["AA".to_string()], 30, path_arr.len());
+
+    let mut cur_paths = vec![(first_key, 0, 0)];
+    loop {
+        let mut remove_index_list = vec![];
+        let mut add_list = vec![];
+        for (index, (path, cur_score, _)) in cur_paths.iter_mut().enumerate() {
+            let key = path.clone();
+            let next_info_list =
+                path.get_next_keys(&path_arr, &short_path, &map);
+
+            if next_info_list.len() != 0 {
+                remove_index_list.push(index);
+            } else {
+                path.set_time(0);
+            }
+            for (next_key, next_score, max_score) in next_info_list {
+                add_list.push((next_key, *cur_score + next_score, max_score));
+            }
+        }
+
+        remove_index_list.sort_by(|a, b| b.cmp(&a));
+        for index in remove_index_list {
+            cur_paths.remove(index);
+        }
+        cur_paths.extend(add_list);
+
+        if cur_paths.len() == 0 && loop_paths.len() == 0 {
+            break;
+        }
+        calc_top_path(&mut cur_paths, &mut loop_paths, &mut complete_paths);
+    }
+
+    println!("time={:?}\nres={:?}", now.elapsed(), complete_paths[0]);
+}
+
+fn parse2() {
     let now = Instant::now();
     let map = parse_input();
     let path_arr = map.get_rate_keys();
