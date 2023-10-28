@@ -4,10 +4,17 @@ use std::{
     collections::HashMap,
 };
 
+#[derive(Debug, Clone)]
+pub enum TypePath {
+    Type1 = 1,
+    Type2 = 2,
+}
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct MapKey {
-    path: Vec<String>,
-    time: i32,
+    path1: Vec<String>,
+    path2: Vec<String>,
+    time1: i32,
+    time2: i32,
     complete_path_size: usize,
 }
 
@@ -18,87 +25,57 @@ impl MapKey {
         complete_path_size: usize,
     ) -> Self {
         MapKey {
-            path,
-            time,
+            path1: path.clone(),
+            path2: path,
+            time1: time,
+            time2: time,
             complete_path_size,
         }
     }
-    pub fn get_time(&self) -> i32 {
-        self.time
+    pub fn rest_time(&self) -> i32 {
+        self.time1 + self.time2
     }
-    pub fn get_rest_key(&self) -> i32 {
-        self.time
+    pub fn update_value(
+        &mut self,
+        type_path: &TypePath,
+        new_key: String,
+        time: i32,
+    ) {
+        match type_path {
+            TypePath::Type1 => {
+                self.time1 = time;
+                self.path1.push(new_key);
+            }
+            TypePath::Type2 => {
+                self.time2 = time;
+                self.path2.push(new_key);
+            }
+        };
     }
-    pub fn set_time(&mut self, new_time: i32) {
-        self.time = new_time;
-    }
-    pub fn is_complete(&self) -> bool {
-        self.time <= 0 || self.complete_path_size == self.path.len()
-    }
-    pub fn get_max_score(
+    pub fn get_rest_key(
         &self,
+        type_path: &TypePath,
         short_path: &HashMap<(String, String), usize>,
         map: &Switches,
-    ) -> usize {
+    ) -> Vec<(String, i32, i32)> {
         let all_keys = map.get_rate_keys();
-        let time = self.time.clone();
-        let path = &self.path;
+        let path = match type_path {
+            TypePath::Type1 => &self.path1,
+            TypePath::Type2 => &self.path2,
+        };
         let last_key = path[path.len() - 1].clone();
+
+        let time = match type_path {
+            TypePath::Type1 => self.time1,
+            TypePath::Type2 => self.time2,
+        };
+
         let mut rest_keys = vec![];
         for item in all_keys {
             let switch = item;
-            if path.contains(&switch.name) {
-                continue;
-            }
-            let name = switch.name.clone();
-            let rate = switch.rate.clone() as i32;
-            let cost_time = short_path
-                .get(&(last_key.clone(), name.clone()))
-                .unwrap()
-                .clone() as i32;
-
-            rest_keys.push((name, rate, cost_time));
-        }
-
-        rest_keys.sort_by(|a, b| {
-            let (a_name, a_rate, a_cost_time) = a;
-            let (b_name, b_rate, b_cost_time) = b;
-
-            let b_value = (time - b_cost_time - 1) * b_rate;
-            let a_value = (time - a_cost_time - 1) * a_rate;
-
-            b_value.cmp(&a_value)
-        });
-
-        let mut change_time = time;
-        let mut score = 0;
-        for (index, item) in rest_keys.iter().enumerate() {
-            let (name, rate, cost_time) = item;
-            if index == 0 {
-                change_time = change_time - cost_time - 1;
-            } else {
-                change_time = cmp::min(time - cost_time - 1, change_time - 2);
-            }
-            if change_time <= 0 {
-                break;
-            }
-            score += time * rate;
-        }
-
-        score as usize
-    }
-    pub fn get_next_keys(
-        &self,
-        all_keys: &Vec<Ref<Switch>>,
-        short_path: &HashMap<(String, String), usize>,
-        map: &Switches,
-    ) -> Vec<(MapKey, usize, usize)> {
-        let path = &self.path;
-        let time = &self.time.clone();
-        let last_key = path[path.len() - 1].clone();
-        let mut rest_keys = vec![];
-        for switch in all_keys {
-            if path.contains(&switch.name) {
+            if self.path1.contains(&switch.name)
+                || self.path2.contains(&switch.name)
+            {
                 continue;
             }
             let name = switch.name.clone();
@@ -122,6 +99,56 @@ impl MapKey {
         });
 
         rest_keys
+    }
+    pub fn set_time(&mut self, new_time: i32) {
+        self.time1 = new_time;
+    }
+    pub fn is_complete(&self) -> bool {
+        self.time1 <= 0 || self.complete_path_size == self.path1.len()
+    }
+    pub fn get_max_score(
+        &self,
+        type_path: &TypePath,
+        short_path: &HashMap<(String, String), usize>,
+        map: &Switches,
+    ) -> usize {
+        let time = match type_path {
+            TypePath::Type1 => self.time1,
+            TypePath::Type2 => self.time2,
+        };
+        let mut rest_keys = self.get_rest_key(type_path, short_path, map);
+
+        let mut change_time = time;
+        let mut score = 0;
+        for (index, item) in rest_keys.iter().enumerate() {
+            let (name, rate, cost_time) = item;
+            if index == 0 {
+                change_time = change_time - cost_time - 1;
+            } else {
+                change_time = cmp::min(time - cost_time - 1, change_time - 2);
+            }
+            if change_time <= 0 {
+                break;
+            }
+            score += time * rate;
+        }
+
+        score as usize
+    }
+    pub fn get_next_keys(
+        &self,
+        type_path: &TypePath,
+        all_keys: &Vec<Ref<Switch>>,
+        short_path: &HashMap<(String, String), usize>,
+        map: &Switches,
+    ) -> Vec<(MapKey, usize, usize)> {
+        let time = match type_path {
+            TypePath::Type1 => self.time1,
+            TypePath::Type2 => self.time2,
+        };
+        let mut rest_keys = self.get_rest_key(type_path, short_path, map);
+
+        rest_keys
             .into_iter()
             .filter(|item| {
                 let (name, rate, cost_time) = item;
@@ -130,13 +157,12 @@ impl MapKey {
             })
             .map(|item| {
                 let (name, rate, cost_time) = item;
-                let mut item_key = self.path.clone();
-                item_key.push(name);
+                let mut key = self.clone();
 
                 let item_time = time - cost_time - 1;
+                key.update_value(type_path, name, item_time);
                 let score = (item_time * rate) as usize;
-                let key = MapKey::new(item_key, item_time, all_keys.len());
-                let max_score = key.get_max_score(short_path, map);
+                let max_score = key.get_max_score(type_path, short_path, map);
                 (key, score, max_score)
             })
             .collect::<Vec<_>>()

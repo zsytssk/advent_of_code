@@ -31,13 +31,14 @@ fn parse1() {
     let first_key = MapKey::new(vec!["AA".to_string()], 30, path_arr.len());
 
     let mut cur_paths = vec![(first_key, 0, 0)];
+    let type_path = TypePath::Type1;
     loop {
         let mut remove_index_list = vec![];
         let mut add_list = vec![];
         for (index, (path, cur_score, _)) in cur_paths.iter_mut().enumerate() {
             let key = path.clone();
             let next_info_list =
-                path.get_next_keys(&path_arr, &short_path, &map);
+                path.get_next_keys(&type_path, &path_arr, &short_path, &map);
 
             if next_info_list.len() != 0 {
                 remove_index_list.push(index);
@@ -72,16 +73,17 @@ fn parse2() {
     let mut loop_paths: PathList = vec![];
     let mut complete_paths: PathList = vec![];
     let short_path = get_short_path(&path_arr, &map);
-    let first_key = MapKey::new(vec!["AA".to_string()], 30, path_arr.len());
+    let first_key = MapKey::new(vec!["AA".to_string()], 26, path_arr.len());
 
     let mut cur_paths = vec![(first_key, 0, 0)];
+    let mut type_path = TypePath::Type1;
     loop {
         let mut remove_index_list = vec![];
         let mut add_list = vec![];
         for (index, (path, cur_score, _)) in cur_paths.iter_mut().enumerate() {
             let key = path.clone();
             let next_info_list =
-                path.get_next_keys(&path_arr, &short_path, &map);
+                path.get_next_keys(&type_path, &path_arr, &short_path, &map);
 
             if next_info_list.len() != 0 {
                 remove_index_list.push(index);
@@ -103,6 +105,10 @@ fn parse2() {
             break;
         }
         calc_top_path(&mut cur_paths, &mut loop_paths, &mut complete_paths);
+        match type_path {
+            TypePath::Type1 => type_path = TypePath::Type2,
+            TypePath::Type2 => type_path = TypePath::Type1,
+        }
     }
 
     println!("time={:?}\nres={:?}", now.elapsed(), complete_paths[0]);
@@ -148,14 +154,14 @@ fn calc_top_path(
         if rate_cmp != std::cmp::Ordering::Equal {
             return rate_cmp;
         }
-        b.0.get_time().cmp(&a.0.get_time())
+        b.0.rest_time().cmp(&a.0.rest_time())
     });
 
     let big_score = cur_paths[0].1;
-    let big_time = cur_paths[0].0.get_time();
+    let big_time = cur_paths[0].0.rest_time();
 
     cur_paths.retain(|item| {
-        if item.1 != big_score || item.0.get_time() != big_time {
+        if item.1 != big_score || item.0.rest_time() != big_time {
             loop_paths.push(item.clone());
             return false;
         }
