@@ -64,6 +64,7 @@ fn calc_top_path(
     path_arr.sort_by(|a, b| b.1.cmp(&a.1));
     let big_num = path_arr[0].1;
 
+    let mut arr = Vec::new();
     loop_path_map.retain(|key, score| {
         if key.is_complete() {
             if *score > *big_num {
@@ -72,8 +73,15 @@ fn calc_top_path(
             return false;
         }
 
+        let big_score = key.get_max_score(short_path, map);
+        if big_score + *score < *big_num {
+            return false;
+        }
+        arr.push();
         return true;
     });
+
+    loop_path_map.
 }
 
 fn parse_input() -> Switches {

@@ -34,16 +34,16 @@ impl MapKey {
     }
     pub fn get_max_score(
         &self,
-        all_keys: &Vec<&RefCell<Switch>>,
         short_path: &HashMap<(String, String), usize>,
         map: &Switches,
-    ) {
-        let mut time = self.time.clone();
+    ) -> usize {
+        let all_keys = map.get_rate_keys();
+        let time = self.time.clone();
         let path = &self.path;
         let last_key = path[path.len() - 1].clone();
         let mut rest_keys = vec![];
         for item in all_keys {
-            let switch = item.borrow();
+            let switch = item;
             if path.contains(&switch.name) {
                 continue;
             }
@@ -67,12 +67,22 @@ impl MapKey {
             b_value.cmp(&a_value)
         });
 
+        let mut change_time = time;
         let mut score = 0;
-        for item in rest_keys {
+        for (index, item) in rest_keys.iter().enumerate() {
             let (name, rate, cost_time) = item;
-            time = cmp::max(time - cost_time - 1, 0);
+            if index == 0 {
+                change_time = change_time - cost_time - 1;
+            } else {
+                change_time = cmp::min(time - cost_time - 1, change_time - 2);
+            }
+            if change_time <= 0 {
+                break;
+            }
             score += time * rate;
         }
+
+        score as usize
     }
     pub fn get_next_keys(
         &self,

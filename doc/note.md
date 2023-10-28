@@ -6,6 +6,8 @@ https://song.xlog.app/aoc-zh
 
 ## 组织语言
 
+- arch
+
 ## day16（难）2
 
 - @ques 如何 loop_key
