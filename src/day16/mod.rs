@@ -28,7 +28,7 @@ fn parse1() {
     let mut loop_paths: PathList = vec![];
     let mut complete_paths: PathList = vec![];
     let short_path = get_short_path(&path_arr, &map);
-    let first_key = MapKey::new(vec!["AA".to_string()], 30, path_arr.len());
+    let first_key = MapKey::new(vec!["AA".to_string()], 30, 0, path_arr.len());
 
     let mut cur_paths = vec![(first_key, 0, 0)];
     let type_path = TypePath::Type1;
@@ -71,15 +71,15 @@ fn parse2() {
     let map = parse_input();
     let path_arr = map.get_rate_keys();
     let short_path = get_short_path(&path_arr, &map);
-    let first_key = MapKey::new(vec!["AA".to_string()], 26, path_arr.len());
+    let first_key = MapKey::new(vec!["AA".to_string()], 26, 26, path_arr.len());
 
     let mut complete_paths: PathList = vec![];
 
     // for i in 0..path_arr.len() + 1 {
     // let mut type1_num = (i) as i32;
     // let mut type2_num = (path_arr.len() - i) as i32;
-    let mut type1_num = (3) as i32;
-    let mut type2_num = (3) as i32;
+    let mut type1_num = (4) as i32;
+    let mut type2_num = (4) as i32;
 
     println!(
         "step: all={:?} | type1_num={:?} | type2_num={:?}",
@@ -91,11 +91,11 @@ fn parse2() {
     let mut type_path = TypePath::Type1;
     let mut loop_paths: PathList = vec![];
     loop {
-        type1_num -= 1;
-        if type1_num >= 0 {
-            type_path = TypePath::Type1
-        } else {
+        type2_num -= 1;
+        if type2_num >= 0 {
             type_path = TypePath::Type2
+        } else {
+            type_path = TypePath::Type1
         }
 
         let mut remove_index_list = vec![];

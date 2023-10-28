@@ -21,14 +21,15 @@ pub struct MapKey {
 impl MapKey {
     pub fn new(
         path: Vec<String>,
-        time: i32,
+        time1: i32,
+        time2: i32,
         complete_path_size: usize,
     ) -> Self {
         MapKey {
             path1: path.clone(),
             path2: path,
-            time1: time,
-            time2: time,
+            time1: time1,
+            time2: time2,
             complete_path_size,
         }
     }
@@ -108,7 +109,8 @@ impl MapKey {
     }
     pub fn is_complete(&self) -> bool {
         (self.time1 <= 0 && self.time2 <= 0)
-            || self.complete_path_size == self.path1.len()
+            || self.complete_path_size + 1
+                == (self.path1.len() + self.path2.len())
     }
     pub fn get_max_score(
         &self,

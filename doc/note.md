@@ -10,6 +10,7 @@ https://song.xlog.app/aoc-zh
 - @ques 能不能優化性能 -> get_max_score 有問題
 
 - @ques 時間 減少的有些問題
+- @ques 怎麼改了幾個問題，時間就變了這個多
 
 ### end
 
@@ -29,6 +30,7 @@ https://song.xlog.app/aoc-zh
   - MapKey
   - complete_path
 
+find_short_path 优化如果已经出现的 map 就直接 return
 find_short_path 优化如果已经出现的 map 就直接 return
 
 ## day16（难）
