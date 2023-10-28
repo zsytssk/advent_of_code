@@ -6,13 +6,16 @@ https://song.xlog.app/aoc-zh
 
 ## day16（难）2
 
+- @ques 所有的可能性 ->（有沒有漏掉的）
+- @ques 能不能優化性能 -> get_max_score 有問題
+
+- @ques 時間 減少的有些問題
+
+### end
+
 - @ques 這種 左一步 右一步 的會不會導致某些情況沒有被用到
 
   - 應該不會，這樣理論上是最大值
-
-- @ques get_max_score 有問題
-
-### end
 
 - @ques 怎麼錯了
 

@@ -43,8 +43,9 @@ fn parse1() {
             if next_info_list.len() != 0 {
                 remove_index_list.push(index);
             } else {
-                path.set_time(0);
+                path.set_time(&type_path, 0);
             }
+
             for (next_key, next_score, max_score) in next_info_list {
                 add_list.push((next_key, *cur_score + next_score, max_score));
             }
@@ -69,15 +70,34 @@ fn parse2() {
     let now = Instant::now();
     let map = parse_input();
     let path_arr = map.get_rate_keys();
-
-    let mut loop_paths: PathList = vec![];
-    let mut complete_paths: PathList = vec![];
     let short_path = get_short_path(&path_arr, &map);
     let first_key = MapKey::new(vec!["AA".to_string()], 26, path_arr.len());
 
-    let mut cur_paths = vec![(first_key, 0, 0)];
+    let mut complete_paths: PathList = vec![];
+
+    // for i in 0..path_arr.len() + 1 {
+    // let mut type1_num = (i) as i32;
+    // let mut type2_num = (path_arr.len() - i) as i32;
+    let mut type1_num = (3) as i32;
+    let mut type2_num = (3) as i32;
+
+    println!(
+        "step: all={:?} | type1_num={:?} | type2_num={:?}",
+        path_arr.len(),
+        type1_num,
+        type2_num
+    );
+    let mut cur_paths = vec![(first_key.clone(), 0, 0)];
     let mut type_path = TypePath::Type1;
+    let mut loop_paths: PathList = vec![];
     loop {
+        type1_num -= 1;
+        if type1_num >= 0 {
+            type_path = TypePath::Type1
+        } else {
+            type_path = TypePath::Type2
+        }
+
         let mut remove_index_list = vec![];
         let mut add_list = vec![];
         for (index, (path, cur_score, _)) in cur_paths.iter_mut().enumerate() {
@@ -88,8 +108,9 @@ fn parse2() {
             if next_info_list.len() != 0 {
                 remove_index_list.push(index);
             } else {
-                path.set_time(0);
+                path.set_time(&type_path, 0);
             }
+
             for (next_key, next_score, max_score) in next_info_list {
                 add_list.push((next_key, *cur_score + next_score, max_score));
             }
@@ -105,12 +126,10 @@ fn parse2() {
             break;
         }
         calc_top_path(&mut cur_paths, &mut loop_paths, &mut complete_paths);
-        match type_path {
-            TypePath::Type1 => type_path = TypePath::Type2,
-            TypePath::Type2 => type_path = TypePath::Type1,
-        }
     }
+    // }
 
+    // println!("time={:?}\nres={:?}", now.elapsed(), complete_paths[0]);
     println!("time={:?}\nres={:?}", now.elapsed(), complete_paths[0]);
 }
 
@@ -139,9 +158,9 @@ fn calc_top_path(
             return false;
         }
 
-        if max_core + *score < big_num {
-            return false;
-        }
+        // if max_core + *score < big_num {
+        //     return false;
+        // }
         return true;
     });
 
@@ -170,7 +189,7 @@ fn calc_top_path(
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/input.txt").unwrap();
+    let content = read_file("day16/demo.txt").unwrap();
 
     let list = content
         .split("\n")

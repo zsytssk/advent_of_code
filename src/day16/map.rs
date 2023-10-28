@@ -100,11 +100,15 @@ impl MapKey {
 
         rest_keys
     }
-    pub fn set_time(&mut self, new_time: i32) {
-        self.time1 = new_time;
+    pub fn set_time(&mut self, type_path: &TypePath, time: i32) {
+        match type_path {
+            TypePath::Type1 => self.time1 = time,
+            TypePath::Type2 => self.time2 = time,
+        };
     }
     pub fn is_complete(&self) -> bool {
-        self.time1 <= 0 || self.complete_path_size == self.path1.len()
+        (self.time1 <= 0 && self.time2 <= 0)
+            || self.complete_path_size == self.path1.len()
     }
     pub fn get_max_score(
         &self,
