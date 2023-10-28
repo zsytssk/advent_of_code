@@ -6,16 +6,17 @@ https://song.xlog.app/aoc-zh
 
 ## 组织语言
 
-- arch
-
 ## day16（难）2
+
+- @ques 怎麼錯了
+  - short_path 有問題
+  - 計算 rate 有問題
+
+### end
 
 - @ques 如何 loop_key
 
 - @ques 便利数组
-
-### end
-
 - @todo
   - MapKey
   - complete_path

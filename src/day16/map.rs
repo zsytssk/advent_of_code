@@ -26,11 +26,11 @@ impl MapKey {
     pub fn get_time(&self) -> i32 {
         self.time
     }
-    pub fn set_time(&self, new_time: i32) {
+    pub fn set_time(&mut self, new_time: i32) {
         self.time = new_time;
     }
     pub fn is_complete(&self) -> bool {
-        self.time <= 0 && self.complete_path_size == self.path.len()
+        self.time <= 0 || self.complete_path_size == self.path.len()
     }
     pub fn get_max_score(
         &self,
@@ -89,7 +89,7 @@ impl MapKey {
         all_keys: &Vec<Ref<Switch>>,
         short_path: &HashMap<(String, String), usize>,
         map: &Switches,
-    ) -> Vec<(MapKey, usize)> {
+    ) -> Vec<(MapKey, usize, usize)> {
         let path = &self.path;
         let time = &self.time.clone();
         let last_key = path[path.len() - 1].clone();
@@ -127,14 +127,14 @@ impl MapKey {
             })
             .map(|item| {
                 let (name, rate, cost_time) = item;
-                let mut new_keys = self.path.clone();
-                new_keys.push(name);
-                let time = time - cost_time - 1;
-                let score = (time * rate) as usize;
-                (
-                    MapKey::new(new_keys, time - cost_time - 1, all_keys.len()),
-                    score,
-                )
+                let mut item_key = self.path.clone();
+                item_key.push(name);
+
+                let item_time = time - cost_time - 1;
+                let score = (item_time * rate) as usize;
+                let key = MapKey::new(item_key, item_time, all_keys.len());
+                let max_score = key.get_max_score(short_path, map);
+                (key, score, max_score)
             })
             .collect::<Vec<_>>()
     }

@@ -59,7 +59,7 @@ fn parse_input() -> Vec<(ListItem, ListItem)> {
 
 pub fn parse_line(str: &str) -> ListItem {
     let items = str.split("").filter(|&c| c != "").collect::<Vec<_>>();
-    let mut local_str = str.clone();
+    let mut local_str = str;
     let mut tokens = Vec::new();
     loop {
         if local_str.len() == 0 {

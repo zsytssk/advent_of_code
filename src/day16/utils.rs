@@ -15,9 +15,9 @@ pub fn get_short_path(
     let big_num = map.list.len();
 
     for i in 0..path_arr.len() {
-        let from = path_arr[i];
+        let from = &path_arr[i];
         for j in 0..path_arr.len() {
-            let to = path_arr[j];
+            let to = &path_arr[j];
             if i == j {
                 continue;
             }

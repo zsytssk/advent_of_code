@@ -1,6 +1,7 @@
 #![allow(unused)]
 use std::{
     cell::{Ref, RefCell},
+    cmp,
     collections::HashMap,
     time::Instant,
 };
@@ -13,7 +14,7 @@ mod utils;
 use map::*;
 
 type PathMap = HashMap<MapKey, usize>;
-
+type PathList = Vec<(MapKey, usize, usize)>;
 pub fn parse() {
     parse1();
     // parse2();
@@ -24,89 +25,102 @@ fn parse1() {
     let map = parse_input();
     let path_arr = map.get_rate_keys();
 
-    let mut loop_path_map: PathMap = HashMap::new();
-    let mut complete_path_map: PathMap = HashMap::new();
+    let mut loop_paths: PathList = vec![];
+    let mut complete_paths: PathList = vec![];
     let short_path = get_short_path(&path_arr, &map);
     let first_key = MapKey::new(vec!["AA".to_string()], 30, path_arr.len());
 
-    let mut cur_paths = vec![first_key];
+    let mut cur_paths = vec![(first_key, 0, 0)];
     loop {
-        for path in cur_paths.iter_mut() {
-            let cur_score = match loop_path_map.get(path) {
-                None => 0,
-                Some(t) => t.clone(),
-            };
+        let mut remove_index_list = vec![];
+        let mut add_list = vec![];
+        for (index, (path, cur_score, _)) in cur_paths.iter_mut().enumerate() {
             let key = path.clone();
             let next_info_list =
                 path.get_next_keys(&path_arr, &short_path, &map);
 
             if next_info_list.len() != 0 {
-                loop_path_map.remove(path);
+                remove_index_list.push(index);
             } else {
                 path.set_time(0);
             }
-            for (next_key, next_score) in next_info_list {
-                loop_path_map.insert(next_key, cur_score + next_score);
+            for (next_key, next_score, max_score) in next_info_list {
+                add_list.push((next_key, *cur_score + next_score, max_score));
             }
         }
+
+        remove_index_list.sort_by(|a, b| b.cmp(&a));
+        for index in remove_index_list {
+            cur_paths.remove(index);
+        }
+        cur_paths.extend(add_list);
+
+        if cur_paths.len() == 0 && loop_paths.len() == 0 {
+            break;
+        }
+        calc_top_path(&mut cur_paths, &mut loop_paths, &mut complete_paths);
     }
 
-    println!("test:>2{:?}", loop_path_map);
+    println!("time={:?}\nres={:?}", now.elapsed(), complete_paths[0]);
 }
 
 fn calc_top_path(
-    loop_path_map: &mut PathMap,
-    complete_path_map: &mut PathMap,
-    short_path: &HashMap<(String, String), usize>,
-    map: &Switches,
-) -> Vec<(MapKey)> {
-    let mut path_arr: Vec<_> = complete_path_map.iter().collect();
-    path_arr.sort_by(|a, b| b.1.cmp(&a.1));
-    let big_num = path_arr[0].1;
+    cur_paths: &mut PathList,
+    loop_paths: &mut PathList,
+    complete_paths: &mut PathList,
+) {
+    let big_num = match complete_paths.get(0) {
+        None => 0,
+        Some(t) => t.1.clone(),
+    };
 
-    let mut arr = Vec::new();
-    loop_path_map.retain(|key, score| {
+    let max_len = 1000;
+    if cur_paths.len() == 0 {
+        let num = cmp::min(max_len, loop_paths.len());
+        let add_list = loop_paths.split_off(loop_paths.len() - num);
+        cur_paths.extend(add_list);
+    }
+
+    cur_paths.retain(|(key, score, max_core)| {
         if key.is_complete() {
-            if *score > *big_num {
-                complete_path_map.insert(key.clone(), *score);
+            if *score > big_num {
+                complete_paths.insert(0, (key.clone(), *score, 0));
             }
             return false;
         }
 
-        let big_score = key.get_max_score(short_path, map);
-        if big_score + *score < *big_num {
+        if max_core + *score < big_num {
             return false;
         }
-        arr.push((key.clone(), score.clone()));
         return true;
     });
 
-    if arr.len() == 0 {
-        return vec![];
+    if cur_paths.len() == 0 {
+        return;
     }
 
-    arr.sort_by(|a, b| {
+    cur_paths.sort_by(|a, b| {
         let rate_cmp = b.1.cmp(&a.1);
         if rate_cmp != std::cmp::Ordering::Equal {
             return rate_cmp;
         }
         b.0.get_time().cmp(&a.0.get_time())
-        // b.0.sum_time().cmp(&a.0.sum_time())
-        // rate_cmp
     });
 
-    let big_score = arr[0].1;
-    let big_time = arr[0].0.get_time();
+    let big_score = cur_paths[0].1;
+    let big_time = cur_paths[0].0.get_time();
 
-    arr.into_iter()
-        .filter(|item| item.1 == big_score && item.0.get_time() == big_time)
-        .map(|item| item.0)
-        // .take(200)
-        .collect::<Vec<_>>()
+    cur_paths.retain(|item| {
+        if item.1 != big_score || item.0.get_time() != big_time {
+            loop_paths.push(item.clone());
+            return false;
+        }
+        return true;
+    });
 }
 
 fn parse_input() -> Switches {
-    let content = read_file("day16/demo.txt").unwrap();
+    let content = read_file("day16/input.txt").unwrap();
 
     let list = content
         .split("\n")
