@@ -26,6 +26,9 @@ impl MapKey {
     pub fn get_time(&self) -> i32 {
         self.time
     }
+    pub fn get_rest_key(&self) -> i32 {
+        self.time
+    }
     pub fn set_time(&mut self, new_time: i32) {
         self.time = new_time;
     }

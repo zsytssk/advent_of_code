@@ -6,6 +6,8 @@ https://song.xlog.app/aoc-zh
 
 ## day16（难）2
 
+- @ques 這種 左一步 右一步 的會不會導致某些情況沒有被用到
+
 ### end
 
 - @ques 怎麼錯了
