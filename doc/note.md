@@ -11,6 +11,7 @@ https://song.xlog.app/aoc-zh
 
 - @ques 時間 減少的有些問題
 - @ques 怎麼改了幾個問題，時間就變了這個多
+- @ques 感覺我這邏輯哪裏有問題
 
 ### end
 

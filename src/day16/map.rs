@@ -118,28 +118,47 @@ impl MapKey {
         short_path: &HashMap<(String, String), usize>,
         map: &Switches,
     ) -> usize {
-        let time = match type_path {
-            TypePath::Type1 => self.time1,
-            TypePath::Type2 => self.time2,
-        };
-        let mut rest_keys = self.get_rest_key(type_path, short_path, map);
+        // let time = match type_path {
+        //     TypePath::Type1 => self.time1,
+        //     TypePath::Type2 => self.time2,
+        // };
+        // let mut rest_keys = self.get_rest_key(type_path, short_path, map);
 
-        let mut change_time = time;
-        let mut score = 0;
-        for (index, item) in rest_keys.iter().enumerate() {
-            let (name, rate, cost_time) = item;
-            if index == 0 {
-                change_time = change_time - cost_time - 1;
-            } else {
-                change_time = cmp::min(time - cost_time - 1, change_time - 2);
-            }
-            if change_time <= 0 {
+        // let mut change_time = time;
+        // let mut score = 0;
+        // for (index, item) in rest_keys.iter().enumerate() {
+        //     let (name, rate, cost_time) = item;
+        //     if index == 0 {
+        //         change_time = change_time - cost_time - 1;
+        //     } else {
+        //         change_time = cmp::min(time - cost_time - 1, change_time - 2);
+        //     }
+        //     if change_time <= 0 {
+        //         break;
+        //     }
+        //     score += time * rate;
+        // }
+
+        // score as usize
+        let mut rest_keys = self.get_rest_key(type_path, short_path, map);
+        let mut all = 0 as usize;
+        let time1 = self.time1;
+        let time2 = self.time2;
+
+        let mut max_val = cmp::max(time1, time2);
+        let mut min_val = cmp::min(time1, time2);
+
+        for item in rest_keys.iter() {
+            if max_val <= 0 {
                 break;
             }
-            score += time * rate;
+            max_val -= 2;
+            if max_val >= 0 {
+                all += max_val as usize * item.1 as usize;
+            }
+            max_val = cmp::max(max_val, min_val)
         }
-
-        score as usize
+        all + 300
     }
     pub fn get_next_keys(
         &self,

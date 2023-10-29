@@ -158,9 +158,9 @@ fn calc_top_path(
             return false;
         }
 
-        // if max_core + *score < big_num {
-        //     return false;
-        // }
+        if max_core + *score < big_num {
+            return false;
+        }
         return true;
     });
 
