@@ -164,7 +164,7 @@ impl MapKey {
             }
             max_val = cmp::max(max_val, min_val)
         }
-        all + 300
+        all
     }
     pub fn get_next_keys(
         &self,

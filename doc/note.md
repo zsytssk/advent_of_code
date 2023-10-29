@@ -1,12 +1,10 @@
-https://adventofcode.com/2022/day/4
+https://adventofcode.com/2022/day/17
 
 ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
 ## day16（难）2
-
-真的花了我九牛二虎之力
 
 - @opt 能不能優化性能 -> get_max_score 有問題
 - @opt MapKey 的數據格式能不能

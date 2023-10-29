@@ -13,8 +13,8 @@ use map::*;
 
 // https://adventofcode.com/2022/day/12#part2
 pub fn parse() {
-    // parse1();
-    parse2();
+    parse1();
+    // parse2();
 }
 
 fn parse1() {
@@ -270,7 +270,7 @@ fn get_dir_pos(
 }
 
 fn parse_input() -> Map {
-    let content = read_file("day12/input.txt").unwrap();
+    let content = read_file("day12/demo.txt").unwrap();
 
     let map_str = content
         .split("\n")

@@ -28,9 +28,9 @@ fn main() {
     // day9::parse();
     // day10::parse();
     // day11::parse();
-    // day12::parse();
+    day12::parse();
     // day13::parse();
     // day14::parse();
     // day15::parse();
-    day16::parse();
+    // day16::parse();
 }
