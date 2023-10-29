@@ -85,7 +85,6 @@ fn parse2() {
             get_big_num(&complete_paths)
         );
 
-        // println!("step: all={:?} | type1_num={:?}", path_arr.len(), type1_num,);
         let mut cur_paths = vec![(first_key.clone(), 0, 0)];
         let mut type_path = TypePath::Type1;
         let mut loop_paths: PathList = vec![];
