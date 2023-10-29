@@ -79,7 +79,8 @@ fn parse2() {
         // let type1_num = path_arr.len() / 2;
         let type1_num = i;
         println!(
-            "type1_num:>{} | big_num={:?}",
+            "time={:?} | type1_num:>{} | big_num={:?}",
+            now.elapsed(),
             type1_num,
             get_big_num(&complete_paths)
         );
