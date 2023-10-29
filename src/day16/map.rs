@@ -36,6 +36,12 @@ impl MapKey {
     pub fn rest_time(&self) -> i32 {
         self.time1 + self.time2
     }
+    pub fn get_path_len(&self, type_path: &TypePath) -> usize {
+        match type_path {
+            TypePath::Type1 => self.path1.len(),
+            TypePath::Type2 => self.path2.len(),
+        }
+    }
     pub fn update_value(
         &mut self,
         type_path: &TypePath,

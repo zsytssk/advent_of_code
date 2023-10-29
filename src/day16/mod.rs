@@ -75,61 +75,87 @@ fn parse2() {
 
     let mut complete_paths: PathList = vec![];
 
-    // for i in 0..path_arr.len() + 1 {
-    // let mut type1_num = (i) as i32;
-    // let mut type2_num = (path_arr.len() - i) as i32;
-    let mut type1_num = (4) as i32;
-    let mut type2_num = (4) as i32;
+    for i in 0..path_arr.len() {
+        // let type1_num = path_arr.len() / 2;
+        let type1_num = i;
+        println!(
+            "type1_num:>{} | big_num={:?}",
+            type1_num,
+            get_big_num(&complete_paths)
+        );
 
-    println!(
-        "step: all={:?} | type1_num={:?} | type2_num={:?}",
-        path_arr.len(),
-        type1_num,
-        type2_num
-    );
-    let mut cur_paths = vec![(first_key.clone(), 0, 0)];
-    let mut type_path = TypePath::Type1;
-    let mut loop_paths: PathList = vec![];
-    loop {
-        type2_num -= 1;
-        if type2_num >= 0 {
-            type_path = TypePath::Type2
-        } else {
-            type_path = TypePath::Type1
-        }
+        // println!("step: all={:?} | type1_num={:?}", path_arr.len(), type1_num,);
+        let mut cur_paths = vec![(first_key.clone(), 0, 0)];
+        let mut type_path = TypePath::Type1;
+        let mut loop_paths: PathList = vec![];
 
-        let mut remove_index_list = vec![];
-        let mut add_list = vec![];
-        for (index, (path, cur_score, _)) in cur_paths.iter_mut().enumerate() {
-            let key = path.clone();
-            let next_info_list =
-                path.get_next_keys(&type_path, &path_arr, &short_path, &map);
+        let mut type_num = type1_num;
+        loop {
+            let mut remove_index_list = vec![];
+            let mut add_list = vec![];
+            for (index, (path, cur_score, _)) in
+                cur_paths.iter_mut().enumerate()
+            {
+                if path.get_path_len(&TypePath::Type1) > type1_num {
+                    type_path = TypePath::Type2;
+                    type_num = path_arr.len() - type1_num;
+                } else {
+                    type_path = TypePath::Type1;
+                    type_num = type1_num;
+                }
 
-            if next_info_list.len() != 0 {
-                remove_index_list.push(index);
-            } else {
-                path.set_time(&type_path, 0);
+                let key = path.clone();
+                let next_info_list = path.get_next_keys(
+                    &type_path,
+                    &path_arr,
+                    &short_path,
+                    &map,
+                );
+
+                if next_info_list.len() != 0 {
+                    remove_index_list.push(index);
+                } else {
+                    path.set_time(&type_path, 0);
+                    // 無法滿足 path1.len == type1_num + 1的直接排除掉
+                    if path.get_path_len(&type_path) <= type_num {
+                        remove_index_list.push(index);
+                        if *cur_score > get_big_num(&complete_paths) {
+                            complete_paths.insert(0, (key, *cur_score, 0));
+                        }
+                    }
+                }
+
+                for (next_key, next_score, max_score) in next_info_list {
+                    add_list.push((
+                        next_key,
+                        *cur_score + next_score,
+                        max_score,
+                    ));
+                }
             }
+            // if loop_paths.len() > 0 {
+            //     println!(
+            //         "loop_paths0={:?} | {} | {}",
+            //         loop_paths[0],
+            //         remove_index_list.len(),
+            //         add_list.len()
+            //     );
+            // }
 
-            for (next_key, next_score, max_score) in next_info_list {
-                add_list.push((next_key, *cur_score + next_score, max_score));
+            remove_index_list.sort_by(|a, b| b.cmp(&a));
+            for index in remove_index_list {
+                cur_paths.remove(index);
             }
-        }
+            cur_paths.extend(add_list);
 
-        remove_index_list.sort_by(|a, b| b.cmp(&a));
-        for index in remove_index_list {
-            cur_paths.remove(index);
+            if cur_paths.len() == 0 && loop_paths.len() == 0 {
+                break;
+            }
+            calc_top_path(&mut cur_paths, &mut loop_paths, &mut complete_paths);
         }
-        cur_paths.extend(add_list);
-
-        if cur_paths.len() == 0 && loop_paths.len() == 0 {
-            break;
-        }
-        calc_top_path(&mut cur_paths, &mut loop_paths, &mut complete_paths);
     }
-    // }
 
-    // println!("time={:?}\nres={:?}", now.elapsed(), complete_paths[0]);
+    // println!("time={:?}\nres={:?}", now.elapsed(), complete_paths);
     println!("time={:?}\nres={:?}", now.elapsed(), complete_paths[0]);
 }
 
@@ -138,10 +164,7 @@ fn calc_top_path(
     loop_paths: &mut PathList,
     complete_paths: &mut PathList,
 ) {
-    let big_num = match complete_paths.get(0) {
-        None => 0,
-        Some(t) => t.1.clone(),
-    };
+    let big_num = get_big_num(complete_paths);
 
     let max_len = 1000;
     if cur_paths.len() == 0 {
@@ -188,8 +211,17 @@ fn calc_top_path(
     });
 }
 
+fn get_big_num(complete_paths: &PathList) -> usize {
+    let big_num = match complete_paths.get(0) {
+        None => 0,
+        Some(t) => t.1.clone(),
+    };
+
+    big_num
+}
+
 fn parse_input() -> Switches {
-    let content = read_file("day16/demo.txt").unwrap();
+    let content = read_file("day16/input.txt").unwrap();
 
     let list = content
         .split("\n")
