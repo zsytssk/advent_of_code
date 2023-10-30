@@ -6,12 +6,14 @@ use std::{
     time::Instant,
 };
 
-use crate::{day12::utils::calc_top_path, utils::read_file};
+use crate::utils::read_file;
 
 mod map;
 mod save;
 mod utils;
 use map::*;
+
+use utils::*;
 
 // https://adventofcode.com/2022/day/12#part2
 pub fn parse() {
@@ -86,23 +88,6 @@ fn parse1() {
         find_item.1,
         now.elapsed()
     );
-}
-
-fn get_next_step<'a>(
-    pos_wrap: &Ref<Point>,
-    map: &'a Map,
-) -> Vec<Ref<'a, Point>> {
-    let pos = pos_wrap;
-    let key = format!("{}:{}", pos.x, pos.y);
-
-    let mut cur_arr = Vec::new();
-    for dir in pos.get_move_dir().iter() {
-        let (x, y) = get_dir_pos(pos_wrap, dir, map).unwrap();
-        let next_pos = map.get_point(x, y).unwrap().borrow();
-        cur_arr.push(next_pos);
-    }
-
-    cur_arr
 }
 
 fn path_has_point(

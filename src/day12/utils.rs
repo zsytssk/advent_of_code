@@ -1,6 +1,26 @@
 use std::cell::Ref;
 
-use super::map::Point;
+use super::{
+    get_dir_pos,
+    map::{Map, Point},
+};
+
+pub fn get_next_step<'a>(
+    pos_wrap: &Ref<Point>,
+    map: &'a Map,
+) -> Vec<Ref<'a, Point>> {
+    let pos = pos_wrap;
+    let key = format!("{}:{}", pos.x, pos.y);
+
+    let mut cur_arr = Vec::new();
+    for dir in pos.get_move_dir().iter() {
+        let (x, y) = get_dir_pos(pos_wrap, dir, map).unwrap();
+        let next_pos = map.get_point(x, y).unwrap().borrow();
+        cur_arr.push(next_pos);
+    }
+
+    cur_arr
+}
 
 pub fn calc_top_path<'a>(
     loop_paths: &mut Vec<(Ref<'a, Point>, i32, i32)>,
