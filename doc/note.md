@@ -4,6 +4,23 @@ ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
+## day12
+
+- @todo 每次求可能性最大的那一块
+
+  - 代价 = 已经进行的步数 + 可能的步数
+
+- @todo 每次求一步
+- @ques `Ref<'_, XX>` 中间的 lifetime 是做什么的
+- @ques 有没有 min_by 这种方法
+
+- @ques left_time 怎么处理
+  - 其实这所有的 lifetime 都是在 map 下面的
+
+### save
+
+原来 step1 -> 31.854178153s
+
 ## day16（难）2
 
 - @opt 能不能優化性能 -> get_max_score 有問題

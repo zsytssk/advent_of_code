@@ -73,6 +73,13 @@ impl Point {
     pub fn has_letter(&self, letter: &str) -> bool {
         self.letter == String::from(letter)
     }
+    pub fn distance(&self, other: &Ref<Point>) -> i32 {
+        (other.x as i32 - self.x as i32).abs()
+            + (other.y as i32 - self.y as i32).abs()
+    }
+    pub fn is_same(&self, other: &Ref<Point>) -> bool {
+        self.x == other.x && self.y == other.y
+    }
 
     pub fn set_move_dir(&mut self, dir: Vec<Dir>) {
         self.move_dir = dir;
