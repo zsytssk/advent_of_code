@@ -4,12 +4,13 @@ use std::{
     collections::HashMap,
     string,
     time::Instant,
+    vec,
 };
 
 use crate::utils::read_file;
 
 mod map;
-mod save;
+mod recursion;
 mod utils;
 use map::*;
 
@@ -17,9 +18,9 @@ use utils::*;
 
 // https://adventofcode.com/2022/day/12#part2
 pub fn parse() {
-    parse1();
-    save::parse1()
-    // parse2();
+    // parse1();
+    // recursion::parse1()
+    parse2();
 }
 
 fn parse1() {
@@ -50,7 +51,7 @@ fn parse1() {
     let mut map_space: HashMap<String, i32> = HashMap::new();
     let mut find_item = None;
 
-    loop {
+    'outer_loop: loop {
         for (index, (item, step, _)) in cur_paths.iter().enumerate() {
             let next_paths = get_next_step(item, &map);
             let next_paths = next_paths
@@ -68,12 +69,10 @@ fn parse1() {
                             if *v <= *priority {
                                 return false;
                             }
-                            map_space.insert(key, priority.clone());
                         }
-                        None => {
-                            map_space.insert(key, priority.clone());
-                        }
+                        None => {}
                     }
+                    map_space.insert(key, priority.clone());
 
                     return true;
                 })
@@ -86,23 +85,13 @@ fn parse1() {
             for item in next_paths.iter() {
                 if end.borrow().is_same(&item.0) {
                     find_item = Some((item.0.clone(), item.1));
-                    break;
+                    break 'outer_loop;
                 }
             }
 
             loop_paths.extend(next_paths);
         }
 
-        if find_item.is_some() {
-            break;
-        }
-
-        // println!(
-        //     "loop_paths={:?}\n end={:?} \n cost_time={:?}",
-        //     loop_paths,
-        //     end,
-        //     now.elapsed()
-        // );
         cur_paths = calc_top_path(&mut loop_paths, end.borrow());
     }
 
@@ -113,6 +102,111 @@ fn parse1() {
         find_item,
         find_item.1,
         now.elapsed()
+    );
+}
+
+pub fn parse2() {
+    let now = Instant::now();
+    let map = parse_input();
+    let mut start_arr = Vec::new();
+    let mut end_wap = None;
+    for y in 0..map.y {
+        for x in 0..map.x {
+            let item = map.get_point(x, y);
+            let item_ref = item.unwrap().borrow();
+            if item_ref.has_letter("a") {
+                start_arr.push(item.unwrap());
+                continue;
+            }
+            if item_ref.has_letter("E") {
+                end_wap = item;
+            }
+        }
+    }
+
+    if (start_arr.len() == 0 || end_wap.is_none()) {
+        panic!("start or end not found!");
+    }
+
+    let end = end_wap.unwrap();
+    let end_ref = end.borrow();
+    start_arr.sort_by(|a, b| {
+        let a_ref = a.borrow();
+        let b_ref = b.borrow();
+        let a_space = (end_ref.x as i32 - a_ref.x as i32).abs()
+            + (end_ref.y as i32 - a_ref.y as i32).abs();
+        let b_space = (end_ref.x as i32 - b_ref.x as i32).abs()
+            + (end_ref.y as i32 - b_ref.y as i32).abs();
+        a_space.cmp(&b_space)
+    });
+
+    let mut find_arr = vec![];
+    let mut min_path = usize::MAX;
+    for (index, start) in start_arr.iter().enumerate() {
+        let mut loop_paths = vec![];
+        let mut cur_paths = vec![(start.borrow(), 0, 0)];
+        let mut map_space: HashMap<String, i32> = HashMap::new();
+
+        'outer_loop: loop {
+            for (_, (item, step, _)) in cur_paths.iter().enumerate() {
+                let next_paths = get_next_step(item, &map);
+                let next_paths = next_paths
+                    .into_iter()
+                    .map(|item| {
+                        let dis = end.borrow().distance(&item);
+                        let new_step = step + 1;
+                        (item, new_step, (dis + new_step))
+                    })
+                    .filter(|item| {
+                        let (pos, _, priority) = item;
+                        let key = format!("{}:{}", pos.x, pos.y);
+                        match map_space.get(&key) {
+                            Some(v) => {
+                                if *v <= *priority {
+                                    return false;
+                                }
+                            }
+                            None => {}
+                        }
+                        map_space.insert(key, priority.clone());
+
+                        return true;
+                    })
+                    .collect::<Vec<_>>();
+
+                if next_paths.len() == 0 {
+                    continue;
+                }
+
+                for item in next_paths.iter() {
+                    if end.borrow().is_same(&item.0) {
+                        find_arr.push((
+                            index,
+                            // start.borrow().clone(),
+                            // item.0.clone(),
+                            item.1,
+                        ));
+                        break 'outer_loop;
+                    }
+                }
+
+                loop_paths.extend(next_paths);
+            }
+
+            if loop_paths.len() == 0 {
+                break;
+            }
+            cur_paths = calc_top_path(&mut loop_paths, end.borrow());
+        }
+    }
+
+    find_arr.sort_by(|a, b| a.1.cmp(&b.1));
+
+    println!(
+        "cost_time={:?} | step={:?}\narr={:?}",
+        now.elapsed(),
+        find_arr[0].1,
+        find_arr,
     );
 }
 
