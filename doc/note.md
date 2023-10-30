@@ -15,7 +15,15 @@ https://song.xlog.app/aoc-zh
 - @ques 有没有 min_by 这种方法
 
 - @ques left_time 怎么处理
+
   - 其实这所有的 lifetime 都是在 map 下面的
+
+- @ques 为什么有那么多的可能性
+
+  - 最短的路径判断难道有问题
+  - 都还没有出门
+
+- @ques 已经经常
 
 ### save
 

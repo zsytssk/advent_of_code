@@ -18,6 +18,7 @@ use utils::*;
 // https://adventofcode.com/2022/day/12#part2
 pub fn parse() {
     parse1();
+    save::parse1()
     // parse2();
 }
 
@@ -44,30 +45,47 @@ fn parse1() {
         panic!("start or end not found!");
     }
     let (start, end) = (start_wap.unwrap(), end_wap.unwrap());
-    let mut loop_paths = vec![(start.borrow(), 0, 0)];
+    let mut loop_paths = vec![];
     let mut cur_paths = vec![(start.borrow(), 0, 0)];
-
+    let mut map_space: HashMap<String, i32> = HashMap::new();
     let mut find_item = None;
 
     loop {
         for (index, (item, step, _)) in cur_paths.iter().enumerate() {
             let next_paths = get_next_step(item, &map);
-            if next_paths.len() == 0 {
-                continue;
-            }
-
             let next_paths = next_paths
                 .into_iter()
                 .map(|item| {
                     let dis = end.borrow().distance(&item);
                     let new_step = step + 1;
-                    (item, step + 1, new_step + dis)
+                    (item, new_step, (dis + new_step))
+                })
+                .filter(|item| {
+                    let (pos, _, priority) = item;
+                    let key = format!("{}:{}", pos.x, pos.y);
+                    match map_space.get(&key) {
+                        Some(v) => {
+                            if *v <= *priority {
+                                return false;
+                            }
+                            map_space.insert(key, priority.clone());
+                        }
+                        None => {
+                            map_space.insert(key, priority.clone());
+                        }
+                    }
+
+                    return true;
                 })
                 .collect::<Vec<_>>();
 
+            if next_paths.len() == 0 {
+                continue;
+            }
+
             for item in next_paths.iter() {
                 if end.borrow().is_same(&item.0) {
-                    find_item = Some((&item.0, item.1));
+                    find_item = Some((item.0.clone(), item.1));
                     break;
                 }
             }
@@ -75,9 +93,17 @@ fn parse1() {
             loop_paths.extend(next_paths);
         }
 
-        cur_paths = calc_top_path(&mut loop_paths, end.borrow());
+        if find_item.is_some() {
+            break;
+        }
 
-        println!("find={:?} cost_time={:?}", cur_paths.len(), now.elapsed());
+        // println!(
+        //     "loop_paths={:?}\n end={:?} \n cost_time={:?}",
+        //     loop_paths,
+        //     end,
+        //     now.elapsed()
+        // );
+        cur_paths = calc_top_path(&mut loop_paths, end.borrow());
     }
 
     let find_item = find_item.unwrap();
@@ -157,7 +183,7 @@ fn get_dir_pos(
 }
 
 fn parse_input() -> Map {
-    let content = read_file("day12/demo.txt").unwrap();
+    let content = read_file("day12/input.txt").unwrap();
 
     let map_str = content
         .split("\n")

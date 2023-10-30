@@ -1,4 +1,4 @@
-use std::cell::Ref;
+use std::{cell::Ref, collections::HashMap};
 
 use super::{
     get_dir_pos,
@@ -10,7 +10,6 @@ pub fn get_next_step<'a>(
     map: &'a Map,
 ) -> Vec<Ref<'a, Point>> {
     let pos = pos_wrap;
-    let key = format!("{}:{}", pos.x, pos.y);
 
     let mut cur_arr = Vec::new();
     for dir in pos.get_move_dir().iter() {
@@ -26,14 +25,7 @@ pub fn calc_top_path<'a>(
     loop_paths: &mut Vec<(Ref<'a, Point>, i32, i32)>,
     end: Ref<Point>,
 ) -> Vec<(Ref<'a, Point>, i32, i32)> {
-    loop_paths.sort_by(|a, b| {
-        let a_move = a.1;
-        let b_move = b.1;
-        let a_dis = end.distance(&a.0);
-        let b_dis = end.distance(&b.0);
-
-        (a.2).cmp(&b.2)
-    });
+    loop_paths.sort_by(|a, b| (a.2).cmp(&b.2));
 
     let min_num = loop_paths[0].2;
 

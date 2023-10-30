@@ -81,6 +81,22 @@ impl Point {
         self.x == other.x && self.y == other.y
     }
 
+    pub fn clone(&self) -> Point {
+        let Point {
+            x,
+            y,
+            letter,
+            move_dir,
+        } = self;
+
+        Point {
+            x: x.clone(),
+            y: y.clone(),
+            move_dir: move_dir.clone(),
+            letter: letter.clone(),
+        }
+    }
+
     pub fn set_move_dir(&mut self, dir: Vec<Dir>) {
         self.move_dir = dir;
     }
