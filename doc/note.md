@@ -4,7 +4,45 @@ ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
+## day17
+
+- @ques 哪些需要熟练的？
+
+  - debug + test + 字符串加减
+
+- @ques 还能怎么的优化性能
+
+  - 一开始就去计算，到时候直接拿就行了
+  - 将 rock_list 分割 成 100 份数 -> 计算的时候直接去取特定区间内的就行了
+
+- @ques rock status ？
+
+- @ques vscode duplicate selection
+
+- @ques 每一个石头的形状
+- @ques 石头和石头 和墙之间的碰撞如何处理
+- @ques 堆积之后又是什么形状
+- @ques 能不能把 chamber 画出来
+- @ques 能不能把 石头换成点 -> 这样就方便多了
+
+- @ques convertLocalPos
+
+### save
+
+- @ques rust print with `\n` -> ` println!("{}", chamber.get_fmt_str());`
+
+### end
+
+- get_rock_in_range
+
+- @ques 画出 champer
+- @note 第一象限坐标系 坐标系 -> rock 要变换
+
+- @ques 画出 Rock
+
 ## day12
+
+- @todo 每次求可能性最大的那一块
 
 - @todo 每次求可能性最大的那一块
 
