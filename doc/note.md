@@ -10,10 +10,7 @@ https://song.xlog.app/aoc-zh
 
   - debug + test + 字符串加减
 
-- @ques 还能怎么的优化性能
-
-  - 一开始就去计算，到时候直接拿就行了
-  - 将 rock_list 分割 成 100 份数 -> 计算的时候直接去取特定区间内的就行了
+- @ques 添加的时候有问题
 
 - @ques rock status ？
 
@@ -32,6 +29,11 @@ https://song.xlog.app/aoc-zh
 - @ques rust print with `\n` -> ` println!("{}", chamber.get_fmt_str());`
 
 ### end
+
+- @ques 还能怎么的优化性能
+
+  - 一开始就去计算，到时候直接拿就行了
+  - 将 rock_list 分割 成 100 份数 -> 计算的时候直接去取特定区间内的就行了
 
 - get_rock_in_range
 

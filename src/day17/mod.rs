@@ -9,8 +9,8 @@ mod utils;
 use rock::*;
 
 pub fn parse() {
-    // parse1();
-    parse2();
+    parse1();
+    // parse2();
 }
 
 const ROCK_ORDER: [RockShape; 5] = [
@@ -52,9 +52,10 @@ fn parse1() {
 
     // println!("{}", chamber.get_fmt_str());
     println!(
-        "time={:?} | height={}",
+        "time={:?} | height={} | top_height={}",
         now.elapsed(),
-        chamber.get_top_height()
+        chamber.rock_list.len(),
+        chamber.top_height
     );
 }
 
@@ -64,7 +65,7 @@ fn parse2() {
     let mut chamber = Chamber::new(7, 0);
 
     let mut char_num = 0;
-    for i in 0..100000 {
+    for i in 0..1000000000000 {
         let type_index = i % 5;
         let shape = ROCK_ORDER[type_index].clone();
         let mut rock = Rock::new(shape, 0, 0);
@@ -96,7 +97,7 @@ fn parse2() {
 }
 
 fn parse_input() -> String {
-    let content = read_file("day17/demo.txt").unwrap();
+    let content = read_file("day17/input.txt").unwrap();
 
     content
 }

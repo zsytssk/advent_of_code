@@ -20,9 +20,11 @@ impl Dir {
 
 #[derive(Debug)]
 pub struct Chamber {
-    rock_list: Vec<Rock>,
-    width: usize,
-    height: usize,
+    pub rock_list: Vec<Vec<Rock>>,
+    pub width: usize,
+    pub height: usize,
+    pub split_num: usize,
+    pub top_height: usize,
 }
 impl Chamber {
     pub fn new(width: usize, height: usize) -> Self {
@@ -30,11 +32,16 @@ impl Chamber {
             rock_list: Vec::new(),
             width,
             height,
+            split_num: 100,
+            top_height: 0,
         }
+    }
+    pub fn get_top_height(&self) -> usize {
+        return self.top_height;
     }
     pub fn adjust_rock(&mut self, rock: &mut Rock) {
         let range = rock.get_inner_range();
-        let top_height = self.get_top_height();
+        let top_height = self.top_height;
         let new_height = top_height + range.1 + 3;
 
         rock.set_pos(2, new_height - range.1);
@@ -42,29 +49,21 @@ impl Chamber {
         self.height = new_height;
     }
     pub fn add_rock(&mut self, mut rock: Rock) {
-        self.rock_list.push(rock);
-    }
-    pub fn contain_dots(&self, dot: &Dot) -> bool {
-        for rock in self.rock_list.iter() {
-            if rock.contain_dots(dot) {
-                return true;
-            }
-        }
-        return false;
-    }
-    /** 所有的石头顶点的最高处 */
-    pub fn get_top_height(&self) -> usize {
-        let mut height = 0;
-
-        for rock in self.rock_list.iter() {
-            let (_, range_y) = rock.get_range();
-            if range_y.1 > height {
-                height = range_y.1
-            }
+        let big_y = rock.y + rock.get_inner_range().1;
+        if big_y > self.top_height {
+            self.top_height = big_y;
         }
 
-        height
+        let step_index = big_y / self.split_num;
+        // println!("add_rock:>{}", step_index);
+        match self.rock_list.get_mut(step_index) {
+            None => {
+                self.rock_list.push(vec![rock]);
+            }
+            Some(t) => t.push(rock),
+        }
     }
+    pub fn get_rock_in_range() {}
     pub fn move_rock_to(&mut self, rock: &mut Rock, dir: Dir) -> bool {
         let mut x = rock.x as i64;
         let mut y = rock.y as i64;
@@ -88,14 +87,6 @@ impl Chamber {
         if x + range.0 as i64 > self.width as i64 {
             return false;
         }
-
-        // for dot in rock.dots.iter() {
-        //     let rx = dot.x + x as usize;
-        //     let ry = dot.y + y as usize;
-        //     if self.contain_dots(&Dot { x: rx, y: ry }) {
-        //         return false;
-        //     }
-        // }
 
         let rel_rocks = self.get_rel_rock(&rock);
         for dot in rock.dots.iter() {
@@ -123,36 +114,50 @@ impl Chamber {
 
         let mut arr = vec![];
 
-        for rock_item in self.rock_list.iter() {
-            let item_range = rock_item.get_inner_range();
-            if rock_item.x > big_x || rock_item.y > big_y {
-                continue;
-            }
-            if rock_item.x + item_range.0 < x || rock_item.y + item_range.1 < y
-            {
-                continue;
-            }
-            arr.push(rock_item);
+        let start_index = y / self.split_num;
+        let end_index = big_y / self.split_num;
+
+        let rock_list = match self.rock_list.get(start_index) {
+            None => return arr,
+            Some(rock_list) => rock_list,
+        };
+
+        for rock in rock_list.iter() {
+            arr.push(rock);
+        }
+
+        if start_index == end_index {
+            return arr;
+        }
+
+        let rock_list = match self.rock_list.get(end_index) {
+            None => return arr,
+            Some(rock_list) => rock_list,
+        };
+
+        for rock in rock_list.iter() {
+            arr.push(rock);
         }
 
         arr
     }
+
     pub fn get_fmt_str(&self) -> String {
         let width = self.width;
         let height = self.height;
 
         let mut all = String::from("");
-        for y in 0..height {
-            let mut line = String::from("");
-            for x in 0..width {
-                if self.contain_dots(&Dot { x, y }) {
-                    line = format!("{}#", line);
-                } else {
-                    line = format!("{}.", line);
-                }
-            }
-            all = format!("{}\n{}", line, all);
-        }
+        // for y in 0..height {
+        //     let mut line = String::from("");
+        //     for x in 0..width {
+        //         if self.contain_dots(&Dot { x, y }) {
+        //             line = format!("{}#", line);
+        //         } else {
+        //             line = format!("{}.", line);
+        //         }
+        //     }
+        //     all = format!("{}\n{}", line, all);
+        // }
 
         all
     }
