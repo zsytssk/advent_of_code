@@ -10,7 +10,10 @@ https://song.xlog.app/aoc-zh
 
   - debug + test + 字符串加减
 
-- @ques 添加的时候有问题
+- @ques 还能怎么优化
+
+  - 这个难道是可以重复的？直接不用计算就知道结果？
+  - 1000000000000 即使是简单的 print 也要花费很长时间啊
 
 - @ques rock status ？
 
@@ -30,6 +33,7 @@ https://song.xlog.app/aoc-zh
 
 ### end
 
+- @ques 添加的时候有问题
 - @ques 还能怎么的优化性能
 
   - 一开始就去计算，到时候直接拿就行了

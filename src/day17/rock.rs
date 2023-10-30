@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, vec};
 
 use super::utils::create_dots;
 
@@ -32,7 +32,7 @@ impl Chamber {
             rock_list: Vec::new(),
             width,
             height,
-            split_num: 100,
+            split_num: 10,
             top_height: 0,
         }
     }
@@ -55,7 +55,6 @@ impl Chamber {
         }
 
         let step_index = big_y / self.split_num;
-        // println!("add_rock:>{}", step_index);
         match self.rock_list.get_mut(step_index) {
             None => {
                 self.rock_list.push(vec![rock]);
@@ -63,7 +62,6 @@ impl Chamber {
             Some(t) => t.push(rock),
         }
     }
-    pub fn get_rock_in_range() {}
     pub fn move_rock_to(&mut self, rock: &mut Rock, dir: Dir) -> bool {
         let mut x = rock.x as i64;
         let mut y = rock.y as i64;
@@ -89,6 +87,7 @@ impl Chamber {
         }
 
         let rel_rocks = self.get_rel_rock(&rock);
+
         for dot in rock.dots.iter() {
             let rx = dot.x + x as usize;
             let ry = dot.y + y as usize;
@@ -106,40 +105,26 @@ impl Chamber {
     }
     /** 获取周围的rock */
     pub fn get_rel_rock(&self, rock: &Rock) -> Vec<&Rock> {
-        let mut x = rock.x;
-        let mut y = rock.y;
+        let y = rock.y;
         let range = rock.get_inner_range();
-        let big_x = x + range.0;
         let big_y = y + range.1;
 
-        let mut arr = vec![];
+        let list_index = big_y / self.split_num;
 
-        let start_index = y / self.split_num;
-        let end_index = big_y / self.split_num;
-
-        let rock_list = match self.rock_list.get(start_index) {
-            None => return arr,
-            Some(rock_list) => rock_list,
-        };
-
-        for rock in rock_list.iter() {
-            arr.push(rock);
+        let mut list = vec![];
+        let mut index_arr = vec![list_index, list_index + 1];
+        if list_index > 0 {
+            index_arr.insert(0, list_index - 1);
         }
 
-        if start_index == end_index {
-            return arr;
+        for index in index_arr {
+            match self.rock_list.get(index) {
+                None => {}
+                Some(rock_list) => list.extend(rock_list),
+            };
         }
 
-        let rock_list = match self.rock_list.get(end_index) {
-            None => return arr,
-            Some(rock_list) => rock_list,
-        };
-
-        for rock in rock_list.iter() {
-            arr.push(rock);
-        }
-
-        arr
+        list
     }
 
     pub fn get_fmt_str(&self) -> String {
