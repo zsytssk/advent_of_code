@@ -4,7 +4,7 @@ ownerproof-3155442-1695261524-344d6e3a17b9
 
 https://song.xlog.app/aoc-zh
 
-## day17
+## day17（part2 没做出来）
 
 - @ques 哪些需要熟练的？
 
@@ -14,16 +14,33 @@ https://song.xlog.app/aoc-zh
 
   - 这个难道是可以重复的？直接不用计算就知道结果？
   - 1000000000000 即使是简单的 print 也要花费很长时间啊
+  - 应该是每隔多少 就有一个重复的 -> 然后重复的直接加上新增的
 
-- @ques rock status ？
+- @ques 看不出有什么规律
+  - 看看代码
+  - 对比
 
-- @ques vscode duplicate selection
+```
+66
+40 - 66
+80 - 125 (40 * 2 + 3)
+120 - 184
+160 - 248 (80 * 2 - 2)
+320 - 490 (160 * 2 - 6)
+640 - 973 (320 * 2 - 7)
+
+1 - 15410
+2 - 30809
+3 - 46211
+4 - 61628
+8 - 123257
+12 - 184879
+
+```
 
 - @ques 每一个石头的形状
 - @ques 石头和石头 和墙之间的碰撞如何处理
 - @ques 堆积之后又是什么形状
-- @ques 能不能把 chamber 画出来
-- @ques 能不能把 石头换成点 -> 这样就方便多了
 
 - @ques convertLocalPos
 
@@ -32,6 +49,11 @@ https://song.xlog.app/aoc-zh
 - @ques rust print with `\n` -> ` println!("{}", chamber.get_fmt_str());`
 
 ### end
+
+- @ques 能不能把 chamber 画出来
+- @ques 能不能把 石头换成点 -> 这样就方便多了
+- @ques vscode duplicate selection
+- @ques rock status ？
 
 - @ques 添加的时候有问题
 - @ques 还能怎么的优化性能

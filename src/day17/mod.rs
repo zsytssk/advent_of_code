@@ -64,9 +64,11 @@ fn parse2() {
     let content = parse_input();
     let mut chamber = Chamber::new(7, 0);
 
+    println!("content len={}", content.len());
+
     let mut char_num = 0;
     // for i in 0..1000000000000 {
-    for i in 0..100000 {
+    for i in 0..(10091 * 12) {
         let type_index = i % 5;
         let shape = ROCK_ORDER[type_index].clone();
         let mut rock = Rock::new(shape, 0, 0);
@@ -98,7 +100,7 @@ fn parse2() {
 }
 
 fn parse_input() -> String {
-    let content = read_file("day17/demo.txt").unwrap();
+    let content = read_file("day17/input.txt").unwrap();
 
     content
 }
