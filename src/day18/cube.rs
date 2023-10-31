@@ -1,3 +1,11 @@
+use std::fmt;
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum SurfaceStatus {
+    Outer,
+    Overlap,
+    Inner,
+}
 pub struct CubeList {
     cubes: Vec<Cube>,
 }
@@ -8,7 +16,7 @@ impl CubeList {
     }
 }
 
-#[derive(Debug)]
+#[derive(PartialEq, Hash, Eq)]
 pub struct Cube {
     pub points: Vec<Point>,
     pub surfaces: Vec<Surface>,
@@ -113,7 +121,13 @@ impl Cube {
     }
 }
 
-#[derive(Debug, PartialEq)]
+impl fmt::Debug for Cube {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{},{},{}", self.x, self.y, self.z)
+    }
+}
+
+#[derive(PartialEq, Hash, Eq)]
 pub struct Surface {
     points: Vec<Point>,
 }
@@ -122,9 +136,52 @@ impl Surface {
     pub fn new(points: Vec<Point>) -> Self {
         Surface { points }
     }
+    pub fn is_overlap(&self, other: &Surface) -> bool {
+        let mut overlap_points_num = 0;
+
+        for point in self.points.iter() {
+            if other.contain_point(point) {
+                overlap_points_num += 1
+            }
+        }
+
+        overlap_points_num == 4
+    }
+    pub fn is_cross(&self, other: &Surface) -> bool {
+        let mut overlap_points_num = 0;
+
+        for point in self.points.iter() {
+            if other.contain_point(point) {
+                overlap_points_num += 1
+            }
+        }
+
+        overlap_points_num == 2
+    }
+    pub fn contain_point(&self, point: &Point) -> bool {
+        self.points.contains(point)
+    }
+    pub fn fmt_str(&self) -> String {
+        let points = &self.points;
+        format!(
+            "{},{},{}->{},{},{}",
+            points[0].x,
+            points[0].y,
+            points[0].z,
+            points[3].x,
+            points[3].y,
+            points[3].z
+        )
+    }
 }
 
-#[derive(Debug, PartialEq)]
+impl fmt::Debug for Surface {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "surface:{}", self.fmt_str())
+    }
+}
+
+#[derive(Debug, PartialEq, Hash, Eq)]
 pub struct Point {
     pub x: usize,
     pub y: usize,
