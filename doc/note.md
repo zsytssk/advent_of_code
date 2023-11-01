@@ -6,6 +6,42 @@ https://song.xlog.app/aoc-zh
 
 - @ques 可以看看答案 -> ...
 
+## day19
+
+- @learn `pub struct Global;`
+
+- @ques 题目的关键是什么？
+
+  - @ques 怎么遍历所有的可能
+  - 选择是什么时候生产什么？
+
+- loop 时间 | HashMap 保存数据 计算可能性
+
+- @ques demo Blueprint1 如果我有两个 ore,我可以生成一个 clay, 也可以继续等待去生产 ore
+
+  - 这两种可能我怎么区分 -> 怎么遍历这种可能性
+
+- 所有的可能性，
+
+  - 必须记录资源 ore + clay + obsidian
+  - 记录机器人的个数
+  - 记录时间
+
+- @ques 怎么去判断优先级？
+  - 步数 + 比例
+  - geode
+    - geode -> ore 1/2| obsidian 1/7
+    - obsidian -> ore 1/3 | clay 1/14
+    - clay -> ore 1/2
+    - 取两边的最小值...
+    - 算出每一个个对应的比例
+
+### end
+
+- @ques `Blueprint (\d+):\n?\s+(Each (\w+) robot costs (\d+) ore( and (\d+) (clay|obsidian)+)?\.\s*)+`
+  - 正则表达式无法匹配所有
+  - 因为这无法重复
+
 ## day 18 （part2 没做出来）
 
 - @ques 关键的地方是 怎么判断是被包围的区域还是公开的区域
@@ -144,6 +180,7 @@ https://song.xlog.app/aoc-zh
   - 这个难道是可以重复的？直接不用计算就知道结果？
   - 1000000000000 即使是简单的 print 也要花费很长时间啊
   - 应该是每隔多少 就有一个重复的 -> 然后重复的直接加上新增的
+  - 把不需要处理的直接排除掉（连在一起的... 我怎么知道连在一起）
 
 - @ques 看不出有什么规律
   - 看看代码
