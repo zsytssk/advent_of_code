@@ -17,6 +17,13 @@ https://song.xlog.app/aoc-zh
 
 - @todo loop 后 测试下 rate 看看有没有问题
 
+  - 调整下比例，让他优先生产机器人
+  - 生产 clay 太多但是不会创建 Obsidian
+
+- @ques 可能把每次时间变化 调整为生产机器人的变化
+
+  - 这样也许可以减少不必要的 loop
+
 - @ques
 
   - 有可能是 rate 让 ore 生产的太多了 -> init_rate
