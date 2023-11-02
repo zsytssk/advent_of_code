@@ -1,133 +1,199 @@
 #![allow(unused)]
+use std::collections::HashMap;
+
 use regex::Regex;
 
 use crate::utils::read_file;
 
-use self::blueprint::{Blueprint, CostType, Robot};
+use self::{
+  blueprint::{Blueprint, RobotType},
+  utils::{calc_top_list, get_next},
+};
 
 mod blueprint;
+mod utils;
 use blueprint::*;
 
 pub fn parse() {
-    parse1();
-    // parse2();
+  parse1();
+  // parse2();
 }
 
 fn parse1() {
-    let content = parse_input1();
-    println!("{:?}", content);
+  let blueprint_list = parse_input1();
 
-    let mut save_list: Vec<LoopInfo> = vec![];
-    let mut loop_list: Vec<LoopInfo> = vec![];
-    loop {
-        for item in loop_list.iter() {}
-    }
+  //   let mut robot_map = HashMap::new();
+  //   robot_map.insert(RobotType::Ore, 1);
+  //   let begin = LoopItem::new(24, robot_map);
+
+  //   for blueprint in blueprint_list.iter() {
+  //     let mut complete_list: Vec<LoopItem> = vec![];
+  //     let mut save_list: Vec<LoopItem> = vec![];
+  //     let mut loop_list: Vec<LoopItem> = vec![begin];
+
+  //     loop {
+  //       let mut remove_list = vec![];
+  //       let mut add_list = vec![];
+  //       for (index, item) in loop_list.iter().enumerate() {
+  //         let next = get_next(item, blueprint);
+
+  //         if next.len() == 0 {
+  //           continue;
+  //         }
+  //         remove_list.push(index);
+  //         add_list.extend(next);
+  //       }
+
+  //       for index in remove_list.into_iter().rev() {
+  //         loop_list.remove(index);
+  //       }
+  //       loop_list.extend(add_list);
+
+  //       loop_list = calc_top_list(
+  //         &mut loop_list,
+  //         &mut save_list,
+  //         &mut complete_list,
+  //         blueprint,
+  //       );
+  //     }
+  //   }
 }
 
 fn parse2() {
-    let content = parse_input2();
-    println!("{:?}", content.len());
+  let content = parse_input2();
+  println!("{:?}", content.len());
 }
 
 fn parse_input1() -> Vec<Blueprint> {
-    let title_reg = Regex::new(r"Blueprint (\d+):").unwrap();
-    let robot_reg = Regex::new(
-        r"Each (\w+) robot costs (\d+) ore( and (\d+) (clay|obsidian)+)?\.",
-    )
-    .unwrap();
-    let content = read_file("day19/demo.txt").unwrap();
+  let title_reg = Regex::new(r"Blueprint (\d+):").unwrap();
+  let robot_reg = Regex::new(
+    r"Each (\w+) robot costs (\d+) ore( and (\d+) (clay|obsidian)+)?\.",
+  )
+  .unwrap();
+  let content = read_file("day19/demo.txt").unwrap();
 
-    content
-        .split("\n\n")
-        .map(|block| {
-            let lines = block.split("\n").collect::<Vec<_>>();
-            let title_find = title_reg.captures(lines[0]);
-            let name = title_find
-                .unwrap()
-                .get(1)
-                .unwrap()
-                .as_str()
-                .parse::<i32>()
-                .unwrap();
+  content
+    .split("\n\n")
+    .map(|block| {
+      let lines = block.split("\n").collect::<Vec<_>>();
+      let title_find = title_reg.captures(lines[0]);
+      let name = title_find
+        .unwrap()
+        .get(1)
+        .unwrap()
+        .as_str()
+        .parse::<i32>()
+        .unwrap();
 
-            let mut robots = Vec::new();
-            for i in 1..lines.len() {
-                let line_find = robot_reg.captures(lines[i]).unwrap();
-                let name: &str = line_find.get(1).unwrap().as_str();
-                let cost_ore: i32 =
-                    line_find.get(2).unwrap().as_str().parse().unwrap();
-                let mut cost_arr = vec![(cost_ore, CostType::Ore)];
+      let mut robots = Vec::new();
+      for i in 1..lines.len() {
+        let line_find = robot_reg.captures(lines[i]).unwrap();
+        let name: &str = line_find.get(1).unwrap().as_str();
+        let cost_ore: i32 = line_find.get(2).unwrap().as_str().parse().unwrap();
+        let mut cost_arr = vec![(RobotType::Ore, cost_ore)];
 
-                match line_find.get(5) {
-                    None => {}
-                    Some(t) => {
-                        let extra_name = CostType::form_str(t.as_str());
-                        let extra_num: i32 =
-                            line_find.get(4).unwrap().as_str().parse().unwrap();
+        match line_find.get(5) {
+          None => {}
+          Some(t) => {
+            let extra_name = RobotType::form_str(t.as_str());
+            let extra_num: i32 =
+              line_find.get(4).unwrap().as_str().parse().unwrap();
 
-                        cost_arr.push((extra_num, extra_name));
-                    }
-                };
+            cost_arr.push((extra_name, extra_num));
+          }
+        };
 
-                let robot = Robot::new(name, cost_arr);
-                robots.push(robot);
-            }
+        let robot = Robot::new(name, cost_arr);
+        robots.push(robot);
+      }
 
-            Blueprint::new(name, robots)
-        })
-        .collect::<Vec<_>>()
+      Blueprint::new(name, robots)
+    })
+    .collect::<Vec<_>>()
 }
 
 fn parse_input2() -> Vec<Blueprint> {
-    let title_reg = Regex::new(r"Blueprint (\d+)").unwrap();
-    let robot_reg = Regex::new(
-        r"Each (\w+) robot costs (\d+) ore( and (\d+) (clay|obsidian)+)?",
-    )
-    .unwrap();
-    let content = read_file("day19/input.txt").unwrap();
+  let title_reg = Regex::new(r"Blueprint (\d+)").unwrap();
+  let robot_reg = Regex::new(
+    r"Each (\w+) robot costs (\d+) ore( and (\d+) (clay|obsidian)+)?",
+  )
+  .unwrap();
+  let content = read_file("day19/input.txt").unwrap();
 
-    content
-        .split("\n")
-        .map(|block| {
-            let lines = block.split(":").collect::<Vec<_>>();
-            let title_find = title_reg.captures(lines[0]);
-            let name = title_find
-                .unwrap()
-                .get(1)
-                .unwrap()
-                .as_str()
-                .parse::<i32>()
-                .unwrap();
+  content
+    .split("\n")
+    .map(|block| {
+      let lines = block.split(":").collect::<Vec<_>>();
+      let title_find = title_reg.captures(lines[0]);
+      let name = title_find
+        .unwrap()
+        .get(1)
+        .unwrap()
+        .as_str()
+        .parse::<i32>()
+        .unwrap();
 
-            let line_list = lines[1]
-                .split(".")
-                .filter(|item| item.len() > 0)
-                .collect::<Vec<_>>();
+      let line_list = lines[1]
+        .split(".")
+        .filter(|item| item.len() > 0)
+        .collect::<Vec<_>>();
 
-            let mut robots = Vec::new();
-            for line in line_list {
-                let line_find = robot_reg.captures(line).unwrap();
-                let name: &str = line_find.get(1).unwrap().as_str();
-                let cost_ore: i32 =
-                    line_find.get(2).unwrap().as_str().parse().unwrap();
-                let mut cost_arr = vec![(cost_ore, CostType::Ore)];
+      let mut robots = Vec::new();
+      for line in line_list {
+        let line_find = robot_reg.captures(line).unwrap();
+        let name: &str = line_find.get(1).unwrap().as_str();
+        let cost_ore: i32 = line_find.get(2).unwrap().as_str().parse().unwrap();
+        let mut cost_arr = vec![(RobotType::Ore, cost_ore)];
 
-                match line_find.get(5) {
-                    None => {}
-                    Some(t) => {
-                        let extra_name = CostType::form_str(t.as_str());
-                        let extra_num: i32 =
-                            line_find.get(4).unwrap().as_str().parse().unwrap();
+        match line_find.get(5) {
+          None => {}
+          Some(t) => {
+            let extra_name = RobotType::form_str(t.as_str());
+            let extra_num: i32 =
+              line_find.get(4).unwrap().as_str().parse().unwrap();
 
-                        cost_arr.push((extra_num, extra_name));
-                    }
-                };
+            cost_arr.push((extra_name, extra_num));
+          }
+        };
 
-                let robot = Robot::new(name, cost_arr);
-                robots.push(robot);
-            }
+        let robot = Robot::new(name, cost_arr);
+        robots.push(robot);
+      }
 
-            Blueprint::new(name, robots)
-        })
-        .collect()
+      Blueprint::new(name, robots)
+    })
+    .collect()
+}
+
+#[cfg(test)]
+mod tests {
+  use std::collections::HashMap;
+
+  use crate::day19::blueprint::RobotType;
+
+  use super::{
+    blueprint::{LoopItem, Robot},
+    utils::get_next,
+  };
+
+  #[test]
+  fn test_get_next() {
+    let blueprints = super::parse_input1();
+    let mut robot_map = HashMap::new();
+    robot_map.insert(RobotType::Ore, 1);
+    let mut begin = LoopItem::new(24, robot_map);
+
+    let mut resource_list = begin.resource_list.clone();
+    resource_list.insert(RobotType::Ore, 3);
+
+    begin.set_res(resource_list);
+
+    let next_list = get_next(&mut begin, blueprints.get(0).unwrap());
+    println!("test:>{:?}\n{:?}", next_list.len(), next_list);
+  }
+  #[test]
+  fn test_init_rate() {
+    let mut blueprints = super::parse_input1();
+    blueprints[0].init_rate();
+  }
 }

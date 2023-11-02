@@ -6,7 +6,53 @@ https://song.xlog.app/aoc-zh
 
 - @ques 可以看看答案 -> ...
 
+- @todo
+  - 优化简历
+  - 朋友内推
+  - 基本算法
+  - 微前端 + ts 基础题目
+  - 基础题目...
+
 ## day19
+
+```rs
+for (cost_type, cost_num) in cost.iter() {
+  rate_arr.clone().iter_mut().map(|x| {
+      *x *= *cost_num as f64
+  })
+  let new_rate = 1.0 / (*cost_num as f32 * base_rate);
+  rate_map
+    .entry(cost_type.clone())
+    .and_modify(|(ore_rate, robot_rate)| {
+        *ore_rate += new_rate;
+    })
+    .or_insert((new_rate, 0.0));
+}
+```
+
+- @ques loop
+
+  - 递进关系怎么处理？
+  - 什么是很结束？
+
+- @ques 如果要计算多层要怎么处理？如果只计算一层会怎样？
+
+  - 数组中每一项都相加如何处理
+
+- @ques 如何计算优先级
+
+  - 取数组的最小值，就可以了
+  - 所有比例都是一个数组 -> `[1, 0]`
+  -
+  - 我怎么知道数组中有几个可能性呢？ -> 数组中的几个元素，每一个值分别对应数组中的哪一个？
+  - ***
+  - 机器比例 = `矿物比例 * 时间就行了`
+  - rate_map 中 key 如果已经存在 怎么处理 -> + 新的
+  - 两个合在一起才有优先级，不然没有。。。
+  - 矿的优先级 + 机器的优先级 机器的优先级要乘以剩余时间 才有效
+  - 两边直接 \* 1/2 会不会更有效 (这样会导致可能一直取积蓄 ore 去了)
+
+- @ques 如果不计算优先级，这题还能做出来吗？
 
 - @learn `pub struct Global;`
 
@@ -28,6 +74,7 @@ https://song.xlog.app/aoc-zh
   - 记录时间
 
 - @ques 怎么去判断优先级？
+  - 可能优先级直接可以把答案得出来
   - 步数 + 比例
   - geode
     - geode -> ore 1/2| obsidian 1/7
@@ -38,9 +85,33 @@ https://song.xlog.app/aoc-zh
 
 ### end
 
+- @ques 如果能创建多个可能，我要怎么处理？
+
+  - 怎么把可能一一的列举出来 -> loop 然后一个个的列举吗
+  - 能创建多少个
+
+- @ques 从五个中取 4 个的可能性，如何用程序实现？
+
 - @ques `Blueprint (\d+):\n?\s+(Each (\w+) robot costs (\d+) ore( and (\d+) (clay|obsidian)+)?\.\s*)+`
   - 正则表达式无法匹配所有
   - 因为这无法重复
+
+### 怎么列举一个个的可能
+
+- @ques 有四个机器人 -> 知道每一个的消耗
+- @ques 资源
+
+- 可能性 可能会爆炸
+
+- @ques 将能创建的扔到数组中，用这个去 loop
+
+  - 直接用 loop 也许可以更好的解决这个问题
+
+- @ques 如果无法新建 robot,这种情况有没有被忽略
+
+- 举一个例子 -> ...
+- @fan
+  - 数字拆分 10 -> 1,2,3 的组合总共有多少种可能
 
 ## day 18 （part2 没做出来）
 
