@@ -1,19 +1,23 @@
 use std::collections::HashMap;
 
-use super::utils::zip_arr;
+use super::utils::{calc_rate, zip_arr};
 
 #[derive(Debug, Clone)]
 pub struct LoopItem {
   pub time: i32,
   pub robot_map: HashMap<RobotType, i32>,
-  pub resource_list: HashMap<RobotType, i32>,
+  pub resource_map: HashMap<RobotType, i32>,
+  pub value: i32,
+  pub rate: f64,
 }
 impl LoopItem {
   pub fn new(time: i32, robot_map: HashMap<RobotType, i32>) -> Self {
     LoopItem {
       time,
       robot_map,
-      resource_list: HashMap::new(),
+      resource_map: HashMap::new(),
+      value: 0,
+      rate: 0.0,
     }
   }
   pub fn is_end(&self) -> bool {
@@ -23,15 +27,21 @@ impl LoopItem {
     self.time -= 1;
     for (type_name, num) in self.robot_map.iter_mut() {
       self
-        .resource_list
+        .resource_map
         .entry(type_name.clone())
-        .and_modify(|x| *x += num.clone())
-        .or_insert(1);
+        .and_modify(|x| {
+          let new_num = x.clone() + num.clone();
+          if type_name == &RobotType::Geode {
+            self.value = new_num;
+          }
+          *x = new_num
+        })
+        .or_insert(num.clone());
     }
-    &self.resource_list
+    &self.resource_map
   }
   pub fn set_res(&mut self, new_res: HashMap<RobotType, i32>) {
-    self.resource_list = new_res
+    self.resource_map = new_res
   }
   pub fn add_robot_num(&mut self, type_name: &RobotType, num: i32) {
     if let Some(v) = self.robot_map.get_mut(type_name) {
@@ -40,23 +50,42 @@ impl LoopItem {
       self.robot_map.insert(type_name.clone(), num);
     }
   }
+  pub fn calc_rate_value(&mut self, blueprint: &Blueprint) {
+    self.rate = calc_rate(self, blueprint);
+    match self.robot_map.get(&RobotType::Geode) {
+      None => {}
+      Some(t) => self.value = t.clone(),
+    }
+  }
 }
 
 #[derive(Debug)]
 pub struct Blueprint {
   pub id: i32,
   pub robots: Vec<Robot>,
+  pub rate_map: Option<HashMap<RobotType, Vec<f64>>>,
 }
 
 impl Blueprint {
   pub fn new(id: i32, robots: Vec<Robot>) -> Self {
-    let mut robot = Blueprint { id, robots };
-    // robot.calc_rate();
+    let mut robot = Blueprint {
+      id,
+      robots,
+      rate_map: None,
+    };
+    robot.init_rate();
     robot
   }
   pub fn get_robot(&self, type_name: &RobotType) -> Option<&Robot> {
     self.robots.iter().find(|item| item.type_name == *type_name)
   }
+  pub fn get_rate_len(&self) -> usize {
+    match &self.rate_map {
+      None => 0,
+      Some(t) => t.get(&RobotType::Geode).unwrap().len(),
+    }
+  }
+
   pub fn init_rate(&mut self) {
     let robots = &self.robots;
     let target_robot_wrap = robots
@@ -67,49 +96,83 @@ impl Blueprint {
       None => return,
       Some(t) => t,
     };
-    let rate_arr = target_robot.cost.iter().map(|item| 1.0).collect::<Vec<_>>();
     // 前面是矿的比例，后面是机器的比例（机器的比例要*剩余时间）
     let mut rate_map: HashMap<RobotType, Vec<f64>> = HashMap::new();
+    rate_map.insert(
+      target_robot.type_name.clone(),
+      vec![1.0; target_robot.cost.len()],
+    );
 
-    let mut cur_loop_list = vec![(target_robot, rate_arr)];
+    for (index, (cost_type, cost_num)) in target_robot.cost.iter().enumerate() {
+      let mut arr = vec![0.0; target_robot.cost.len()];
+      arr[index] = 1.0 / cost_num.clone() as f64;
+      rate_map.insert(cost_type.clone(), arr);
+    }
+
+    let mut cur_loop_list = target_robot
+      .cost
+      .clone()
+      .into_iter()
+      .map(|item| self.get_robot(&item.0).unwrap())
+      .collect::<Vec<_>>();
+
+    let mut loop_type_arr = vec![target_robot.type_name.clone()];
     loop {
-      let mut cur_loop: Vec<(&Robot, Vec<f64>)> = vec![];
-      for (robot, robot_rate_arr) in cur_loop_list.iter() {
+      let mut cur_loop: Vec<&Robot> = vec![];
+      for robot in cur_loop_list.iter() {
         let cost = &robot.cost;
+        if loop_type_arr.contains(&robot.type_name) {
+          continue;
+        }
+        loop_type_arr.push(robot.type_name.clone());
+        let cur_rate_arr = rate_map.get(&robot.type_name).unwrap().clone();
 
-        for (index, (cost_type, cost_num)) in cost.iter().enumerate() {
-          let cur_rate_arr = robot_rate_arr
+        for (cost_type, cost_num) in cost.iter() {
+          let new_rate = cur_rate_arr
             .clone()
-            .iter_mut()
-            .enumerate()
-            .map(|(_index, v)| {
-              if index == _index {
-                return 1.0 / *cost_num as f64;
-              }
-              return 0.0;
-            })
+            .into_iter()
+            .map(|mut item| item * 1.0 / cost_num.clone() as f64)
             .collect::<Vec<_>>();
 
           rate_map
             .entry(cost_type.clone())
-            .and_modify(|x| *x = zip_arr(x.clone(), cur_rate_arr.clone()))
-            .or_insert(cur_rate_arr.clone());
+            .and_modify(|x| {
+              let new_arr = zip_arr(x.clone(), new_rate.clone());
+              let big_num = new_arr
+                .iter()
+                .max_by(|a, b| a.partial_cmp(b).unwrap())
+                .unwrap()
+                .clone();
+
+              *x = new_arr
+                .into_iter()
+                .map(|item| {
+                  if item == big_num {
+                    return item;
+                  }
+                  return 0.0;
+                })
+                .collect()
+            })
+            .or_insert(new_rate);
 
           match self.get_robot(cost_type) {
             None => {}
             Some(robot) => {
-              cur_loop.push((robot, cur_rate_arr.clone()));
+              cur_loop.push(robot);
             }
           }
         }
       }
+
+      loop_type_arr.dedup();
+      if loop_type_arr.len() == robots.len() {
+        break;
+      }
       cur_loop_list = cur_loop;
     }
 
-    println!(
-      "cur_loop_list:>{:?}\nrate_map={:?}",
-      cur_loop_list, rate_map
-    );
+    self.rate_map = Some(rate_map);
   }
 }
 
@@ -132,7 +195,7 @@ impl RobotType {
   }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Robot {
   pub type_name: RobotType,
   pub cost: Vec<(RobotType, i32)>,

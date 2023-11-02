@@ -22,41 +22,68 @@ pub fn parse() {
 fn parse1() {
   let blueprint_list = parse_input1();
 
-  //   let mut robot_map = HashMap::new();
-  //   robot_map.insert(RobotType::Ore, 1);
-  //   let begin = LoopItem::new(24, robot_map);
+  let mut robot_map = HashMap::new();
+  robot_map.insert(RobotType::Ore, 1);
+  let begin = LoopItem::new(18, robot_map);
 
-  //   for blueprint in blueprint_list.iter() {
-  //     let mut complete_list: Vec<LoopItem> = vec![];
-  //     let mut save_list: Vec<LoopItem> = vec![];
-  //     let mut loop_list: Vec<LoopItem> = vec![begin];
+  let mut res = vec![];
+  for blueprint in blueprint_list.iter() {
+    let mut complete_list: Vec<LoopItem> = vec![];
+    let mut save_list: Vec<LoopItem> = vec![];
+    let mut loop_list: Vec<LoopItem> = vec![begin.clone()];
 
-  //     loop {
-  //       let mut remove_list = vec![];
-  //       let mut add_list = vec![];
-  //       for (index, item) in loop_list.iter().enumerate() {
-  //         let next = get_next(item, blueprint);
+    loop {
+      let mut remove_list = vec![];
+      let mut add_list = vec![];
+      for (index, item) in loop_list.iter().enumerate() {
+        let next = get_next(item, blueprint);
 
-  //         if next.len() == 0 {
-  //           continue;
-  //         }
-  //         remove_list.push(index);
-  //         add_list.extend(next);
-  //       }
+        // println!("next:{:?} | loop_list:{:?} ", next.len(), loop_list.len());
 
-  //       for index in remove_list.into_iter().rev() {
-  //         loop_list.remove(index);
-  //       }
-  //       loop_list.extend(add_list);
+        if next.len() == 0 {
+          continue;
+        }
+        remove_list.push(index);
+        add_list.extend(next);
+      }
+      //   println!(
+      //     "complete_list:{:?} | add_list:{:?} | loop_list:{:?} | save_list:{:?}|",
+      //     complete_list.len(),
+      //     add_list.len(),
+      //     loop_list.len(),
+      //     save_list.len()
+      //   );
 
-  //       loop_list = calc_top_list(
-  //         &mut loop_list,
-  //         &mut save_list,
-  //         &mut complete_list,
-  //         blueprint,
-  //       );
-  //     }
-  //   }
+      for index in remove_list.into_iter().rev() {
+        loop_list.remove(index);
+      }
+      loop_list.extend(add_list);
+
+      if loop_list.len() == 0 && save_list.len() == 0 {
+        break;
+      }
+
+      calc_top_list(
+        &mut loop_list,
+        &mut save_list,
+        &mut complete_list,
+        blueprint,
+      );
+
+      //   println!("loop_list:{:?}", loop_list);
+      //   println!(
+      //     "complete_list:{:?} | loop_list:{:?} | save_list:{:?}|",
+      //     complete_list,
+      //     loop_list.len(),
+      //     save_list.len()
+      //   );
+    }
+
+    let num = complete_list[0].value;
+    res.push((blueprint.id.clone(), num));
+  }
+
+  println!("res:{:?}", res);
 }
 
 fn parse2() {
@@ -169,7 +196,7 @@ fn parse_input2() -> Vec<Blueprint> {
 mod tests {
   use std::collections::HashMap;
 
-  use crate::day19::blueprint::RobotType;
+  use crate::day19::{blueprint::RobotType, utils::calc_rate};
 
   use super::{
     blueprint::{LoopItem, Robot},
@@ -183,7 +210,7 @@ mod tests {
     robot_map.insert(RobotType::Ore, 1);
     let mut begin = LoopItem::new(24, robot_map);
 
-    let mut resource_list = begin.resource_list.clone();
+    let mut resource_list = begin.resource_map.clone();
     resource_list.insert(RobotType::Ore, 3);
 
     begin.set_res(resource_list);
@@ -194,6 +221,20 @@ mod tests {
   #[test]
   fn test_init_rate() {
     let mut blueprints = super::parse_input1();
-    blueprints[0].init_rate();
+    // blueprints[0].init_rate();
+    println!("test:>{:?}", blueprints[0].rate_map);
+  }
+  #[test]
+  fn test_calc_rate() {
+    let mut blueprints = super::parse_input1();
+    let blueprint = blueprints.remove(0);
+
+    let mut robot_map = HashMap::new();
+    robot_map.insert(RobotType::Ore, 1);
+    // robot_map.insert(RobotType::Geode, 1);
+    let begin = LoopItem::new(24, robot_map);
+
+    // blueprints[0].init_rate();
+    println!("test:> {:?}", calc_rate(&begin, &blueprint));
   }
 }

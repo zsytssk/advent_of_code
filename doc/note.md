@@ -15,25 +15,16 @@ https://song.xlog.app/aoc-zh
 
 ## day19
 
-```rs
-for (cost_type, cost_num) in cost.iter() {
-  rate_arr.clone().iter_mut().map(|x| {
-      *x *= *cost_num as f64
-  })
-  let new_rate = 1.0 / (*cost_num as f32 * base_rate);
-  rate_map
-    .entry(cost_type.clone())
-    .and_modify(|(ore_rate, robot_rate)| {
-        *ore_rate += new_rate;
-    })
-    .or_insert((new_rate, 0.0));
-}
-```
+- @todo loop 后 测试下 rate 看看有没有问题
 
-- @ques loop
+- @ques
 
-  - 递进关系怎么处理？
-  - 什么是很结束？
+  - 有可能是 rate 让 ore 生产的太多了 -> init_rate
+  - 哪里计算有问题 + 能不能优化效率
+
+- @ques 开始的是不是最大的
+
+- @ques `target_robot.cost` 和 下面的 loop 能不能合并
 
 - @ques 如果要计算多层要怎么处理？如果只计算一层会怎样？
 
@@ -43,7 +34,7 @@ for (cost_type, cost_num) in cost.iter() {
 
   - 取数组的最小值，就可以了
   - 所有比例都是一个数组 -> `[1, 0]`
-  -
+  - ***
   - 我怎么知道数组中有几个可能性呢？ -> 数组中的几个元素，每一个值分别对应数组中的哪一个？
   - ***
   - 机器比例 = `矿物比例 * 时间就行了`
@@ -63,6 +54,12 @@ for (cost_type, cost_num) in cost.iter() {
 
 - loop 时间 | HashMap 保存数据 计算可能性
 
+### end
+
+- @ques 感觉这有些问题， Blueprint 1 clay
+
+- @ques calc_top_list
+
 - @ques demo Blueprint1 如果我有两个 ore,我可以生成一个 clay, 也可以继续等待去生产 ore
 
   - 这两种可能我怎么区分 -> 怎么遍历这种可能性
@@ -74,6 +71,7 @@ for (cost_type, cost_num) in cost.iter() {
   - 记录时间
 
 - @ques 怎么去判断优先级？
+
   - 可能优先级直接可以把答案得出来
   - 步数 + 比例
   - geode
@@ -83,7 +81,25 @@ for (cost_type, cost_num) in cost.iter() {
     - 取两边的最小值...
     - 算出每一个个对应的比例
 
-### end
+- @ques loop
+
+  - 递进关系怎么处理？
+  - 什么是很结束？ -> rate_map.len() == robots.len()
+
+```rs
+for (cost_type, cost_num) in cost.iter() {
+  rate_arr.clone().iter_mut().map(|x| {
+      *x *= *cost_num as f64
+  })
+  let new_rate = 1.0 / (*cost_num as f32 * base_rate);
+  rate_map
+    .entry(cost_type.clone())
+    .and_modify(|(ore_rate, robot_rate)| {
+        *ore_rate += new_rate;
+    })
+    .or_insert((new_rate, 0.0));
+}
+```
 
 - @ques 如果能创建多个可能，我要怎么处理？
 
