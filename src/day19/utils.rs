@@ -7,9 +7,7 @@ use std::{
 use super::blueprint::{self, Blueprint, LoopItem, Robot, RobotType};
 
 pub fn get_next(item: &LoopItem, blueprint: &Blueprint) -> Vec<LoopItem> {
-  let mut new_item = item.clone();
-  new_item.update_time();
-  new_item.calc_rate_value(blueprint);
+  let new_item = item.clone();
 
   let mut index = 0;
   let mut list = vec![new_item];
@@ -29,7 +27,7 @@ pub fn get_next(item: &LoopItem, blueprint: &Blueprint) -> Vec<LoopItem> {
         if i > 0 {
           let new_res_map = minus_res(&res_map, cur_robot, i);
           new_item.set_res(new_res_map);
-          new_item.add_robot_num(&cur_robot.type_name, i);
+          new_item.add_temp_robot_num(&cur_robot.type_name, i);
         }
         new_item.calc_rate_value(blueprint);
         add_list.push(new_item);
@@ -45,6 +43,12 @@ pub fn get_next(item: &LoopItem, blueprint: &Blueprint) -> Vec<LoopItem> {
     if index >= blueprint.robots.len() {
       break;
     }
+  }
+
+  for item in list.iter_mut() {
+    item.update_time();
+    item.update_robot_num();
+    item.calc_rate_value(blueprint);
   }
 
   list
@@ -138,34 +142,23 @@ pub fn calc_top_list(
   let big_rate = loop_list[0].rate;
   let first_time = loop_list[0].time;
 
-  println!(
-    "robot_map:{:?} | resource_map={:?}",
-    loop_list[0].robot_map, loop_list[0].resource_map
-  );
-  // if loop_list.len() > max_num {
-  //   let temp_save_ele = loop_list.split_off(max_num);
-  //   save_list.extend(temp_save_ele);
-  // }
+  // println!(
+  //   "time={} | obot_map:{:?} | resource_map={:?}",
+  //   first_time, loop_list[0].robot_map, loop_list[0].resource_map
+  // );
 
-  // if loop_list.len() > max_num {
-  //   //   let temp_save_ele = loop_list.split_off(max_num);
-  //   //   save_list.extend(temp_save_ele);
-  //   loop_list.retain(|item| {
-  //     if item.value != big_value || item.rate != big_rate {
-  //       save_list.push(item.clone());
-  //       return false;
-  //     }
-  //     return true;
-  //   });
-  // }
+  if loop_list.len() > max_num {
+    let temp_save_ele = loop_list.split_off(max_num);
+    save_list.extend(temp_save_ele);
+  }
 
-  loop_list.retain(|item| {
-    if item.value != big_value || item.rate != big_rate {
-      save_list.push(item.clone());
-      return false;
-    }
-    return true;
-  });
+  // loop_list.retain(|item| {
+  //   if item.value != big_value || item.rate != big_rate {
+  //     save_list.push(item.clone());
+  //     return false;
+  //   }
+  //   return true;
+  // });
 
   //   println!(
   //     "big_value:{:?} | big_rate:{:?}| first_time:{:?}| loop_list.len():{:?}|",
@@ -189,10 +182,6 @@ pub fn calc_rate(item: &LoopItem, blueprint: &Blueprint) -> f64 {
 
   let mut rate_arr: Vec<f64> = vec![0.0; blueprint.get_rate_len()];
   for (type_name, item_num) in robot_map.iter() {
-    if type_name == &RobotType::Geode {
-      rate += item_num.clone() as f64;
-      continue;
-    }
     let mut rate_unit = match rate_map.get(type_name) {
       None => {
         continue;
@@ -209,9 +198,6 @@ pub fn calc_rate(item: &LoopItem, blueprint: &Blueprint) -> f64 {
   }
 
   for (type_name, item_num) in resource_map.iter() {
-    if type_name == &RobotType::Geode {
-      continue;
-    }
     let mut rate_unit = match rate_map.get(type_name) {
       None => {
         continue;

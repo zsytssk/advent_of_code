@@ -19,6 +19,9 @@ https://song.xlog.app/aoc-zh
 
   - 调整下比例，让他优先生产机器人
   - 生产 clay 太多但是不会创建 Obsidian
+  - 也不会自己生成 ore
+
+- @ques 要花时间才能创建 robot
 
 - @ques 可能把每次时间变化 调整为生产机器人的变化
 

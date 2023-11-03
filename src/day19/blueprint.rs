@@ -6,6 +6,7 @@ use super::utils::{calc_rate, zip_arr};
 pub struct LoopItem {
   pub time: i32,
   pub robot_map: HashMap<RobotType, i32>,
+  pub temp_robot_map: HashMap<RobotType, i32>,
   pub resource_map: HashMap<RobotType, i32>,
   pub value: i32,
   pub rate: f64,
@@ -16,6 +17,7 @@ impl LoopItem {
       time,
       robot_map,
       resource_map: HashMap::new(),
+      temp_robot_map: HashMap::new(),
       value: 0,
       rate: 0.0,
     }
@@ -40,19 +42,30 @@ impl LoopItem {
     }
     &self.resource_map
   }
+  pub fn update_robot_num(&mut self) {
+    for item in self.temp_robot_map.iter() {
+      if let Some(v) = self.robot_map.get_mut(item.0) {
+        *v += item.1
+      } else {
+        self.robot_map.insert(item.0.clone(), item.1.clone());
+      }
+    }
+
+    self.temp_robot_map.clear();
+  }
   pub fn set_res(&mut self, new_res: HashMap<RobotType, i32>) {
     self.resource_map = new_res
   }
-  pub fn add_robot_num(&mut self, type_name: &RobotType, num: i32) {
-    if let Some(v) = self.robot_map.get_mut(type_name) {
+  pub fn add_temp_robot_num(&mut self, type_name: &RobotType, num: i32) {
+    if let Some(v) = self.temp_robot_map.get_mut(type_name) {
       *v += num
     } else {
-      self.robot_map.insert(type_name.clone(), num);
+      self.temp_robot_map.insert(type_name.clone(), num);
     }
   }
   pub fn calc_rate_value(&mut self, blueprint: &Blueprint) {
     self.rate = calc_rate(self, blueprint);
-    match self.robot_map.get(&RobotType::Geode) {
+    match self.resource_map.get(&RobotType::Geode) {
       None => {}
       Some(t) => self.value = t.clone(),
     }
@@ -131,7 +144,7 @@ impl Blueprint {
           let new_rate = cur_rate_arr
             .clone()
             .into_iter()
-            .map(|mut item| item * 1.0 / cost_num.clone() as f64)
+            .map(|item| item * 0.5 / cost_num.clone() as f64)
             .collect::<Vec<_>>();
 
           rate_map

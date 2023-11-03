@@ -24,10 +24,13 @@ fn parse1() {
 
   let mut robot_map = HashMap::new();
   robot_map.insert(RobotType::Ore, 1);
-  let begin = LoopItem::new(18, robot_map);
+  let begin = LoopItem::new(24, robot_map);
 
   let mut res = vec![];
-  for blueprint in blueprint_list.iter() {
+  for ((index, blueprint)) in blueprint_list.iter().enumerate() {
+    // if index == 0 {
+    //   continue;
+    // }
     let mut complete_list: Vec<LoopItem> = vec![];
     let mut save_list: Vec<LoopItem> = vec![];
     let mut loop_list: Vec<LoopItem> = vec![begin.clone()];
@@ -69,6 +72,11 @@ fn parse1() {
         &mut complete_list,
         blueprint,
       );
+
+      // if complete_list.len() > 0 {
+      //   println!("complete_list:{:?}", complete_list[0]);
+      //   break;
+      // }
 
       //   println!("loop_list:{:?}", loop_list);
       //   println!(
@@ -211,7 +219,7 @@ mod tests {
     let mut begin = LoopItem::new(24, robot_map);
 
     let mut resource_list = begin.resource_map.clone();
-    resource_list.insert(RobotType::Ore, 3);
+    resource_list.insert(RobotType::Ore, 2);
 
     begin.set_res(resource_list);
 
