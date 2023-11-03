@@ -13,18 +13,29 @@ https://song.xlog.app/aoc-zh
   - 微前端 + ts 基础题目
   - 基础题目...
 
-## day19
+## day19 遍历所有 机器人数量
 
-- @todo loop 后 测试下 rate 看看有没有问题
+```rs
+blueprint -> robotRange type: [0, big_num]
 
-  - 调整下比例，让他优先生产机器人
-  - 生产 clay 太多但是不会创建 Obsidian
-  - 也不会自己生成 ore
+矿物数量
+机器人数量
+```
 
-- @ques 要花时间才能创建 robot
+## day19 (part1 都没有做出来)
+
+- @ques 用方程解决？
+
+  - 假如只用生成 ore, 在 24 分钟内怎么做 最多生成 ore 的个数最多 -> 不会
+  - 可以写一个程序 穷举出来
+  - 最多采集多少个 -> clay 矿物 -> obsidian -> geode
+  - @ques 先创建好机器人 就一定 采集的矿物就一定多吗 -> 假如是对的
+
+- @ques 24 分钟内最多能生成 142 个 ore 机器人
 
 - @ques 可能把每次时间变化 调整为生产机器人的变化
 
+  - 最快生成 A,B,C,D 的速度 -> 转换成那个 rate 的值
   - 这样也许可以减少不必要的 loop
 
 - @ques
@@ -33,6 +44,8 @@ https://song.xlog.app/aoc-zh
   - 哪里计算有问题 + 能不能优化效率
 
 - @ques 开始的是不是最大的
+
+- @ques 如果我能计算出最大值就好了
 
 - @ques `target_robot.cost` 和 下面的 loop 能不能合并
 
@@ -65,6 +78,14 @@ https://song.xlog.app/aoc-zh
 - loop 时间 | HashMap 保存数据 计算可能性
 
 ### end
+
+- @todo loop 后 测试下 rate 看看有没有问题
+
+  - 调整下比例，让他优先生产机器人
+  - 生产 clay 太多但是不会创建 Obsidian
+  - 也不会自己生成 ore
+
+- @ques 要花时间才能创建 robot
 
 - @ques 感觉这有些问题， Blueprint 1 clay
 
