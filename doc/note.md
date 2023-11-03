@@ -15,6 +15,17 @@ https://song.xlog.app/aoc-zh
 
 ## day19 遍历所有 机器人数量
 
+- 感觉我的数学能力还是比较欠缺
+
+- 这有一个条件：在 ore 机器人数量为 n 时求 clay 机器人的范围
+
+  - 这时候是不是先把 ore 机器人创建好了，clay 机器人将有最大的范围
+  - 同理在计算 obsidian+geode 范围时是不是也要先把其他的计算好
+  - 假如不是这样，那我这些假设都没有什么用
+
+- 思路 求 ore 机器人的范围 -> for ore 的范围 求 clay 的范围 ->
+  - for clay 范围 -> obsidian 的范围 -> ... geode 的范围
+
 ```rs
 blueprint -> robotRange type: [0, big_num]
 
