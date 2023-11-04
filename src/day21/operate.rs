@@ -4,6 +4,7 @@ pub enum Operator {
   Minus,
   Multiply,
   Divide,
+  Equal,
 }
 
 impl Operator {
@@ -39,6 +40,7 @@ impl Operate {
 #[derive(Debug)]
 pub enum OperateWrap {
   Number(i64),
+  Unknown,
   Operate(Operate),
 }
 

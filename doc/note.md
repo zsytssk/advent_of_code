@@ -15,6 +15,13 @@ https://song.xlog.app/aoc-zh
 
 ## day21
 
+- @ques 已经知道结果 value，怎么反推表达式的 value
+
+- @ques 怎么 loop
+- @ques 怎么计算表达式的值
+
+### end
+
 - @ques 难点 -> 怎么记录结果
 
 - @ques loop 的优先级如何处理？

@@ -7,14 +7,73 @@ mod operate;
 use operate::*;
 
 pub fn parse() {
-  parse1();
-  // parse2();
+  // parse1();
+  parse2();
 }
 
 fn parse1() {
   let statements = parse_input();
   let now = Instant::now();
 
+  let (res_map, _) = parse_step1(&statements);
+  println!(
+    "now={:?} | res={:?}",
+    now.elapsed(),
+    res_map.get("root").unwrap()
+  );
+}
+
+fn parse2() {
+  let mut statements = parse_input();
+  let now = Instant::now();
+
+  let root = statements
+    .iter_mut()
+    .find(|item| item.name == "root")
+    .unwrap();
+
+  match &mut root.op {
+    OperateWrap::Operate(n) => {
+      n.opr = Operator::Equal;
+    }
+    _ => unreachable!(),
+  };
+
+  let human = statements
+    .iter_mut()
+    .find(|item| item.name == "humn")
+    .unwrap();
+
+  human.op = OperateWrap::Unknown;
+
+  let mut save_arr: Vec<String> = vec![];
+
+  let (mut res_map, save_arr) = parse_step1(&statements);
+  let root = statements
+    .iter_mut()
+    .find(|item| item.name == "root")
+    .unwrap();
+
+  match &mut root.op {
+    OperateWrap::Operate(n) => {
+      let left = res_map.get(&n.left);
+      let right = res_map.get(&n.right);
+
+      if right.is_some() {
+        let val = right.unwrap().clone();
+        res_map.insert(n.left.clone(), val.clone());
+      } else if left.is_some() {
+        let val = left.unwrap().clone();
+        res_map.insert(n.right.clone(), val.clone());
+      }
+    }
+    _ => unreachable!(),
+  };
+}
+
+fn parse_step1(
+  statements: &Vec<Statement>,
+) -> (HashMap<String, i64>, Vec<String>) {
   let mut loop_arr: Vec<String> = vec![];
   let mut save_arr: Vec<String> = vec![];
   let mut res_map: HashMap<String, i64> = HashMap::new();
@@ -23,6 +82,10 @@ fn parse1() {
     match &item.op {
       OperateWrap::Number(num) => {
         res_map.insert(item.name.clone(), num.clone());
+      }
+      OperateWrap::Unknown => {
+        save_arr.push(item.name.clone());
+        continue;
       }
       OperateWrap::Operate(op) => {
         save_arr.push(item.name.clone());
@@ -39,13 +102,13 @@ fn parse1() {
 
   loop {
     calc_top_list(&mut loop_arr, &mut save_arr, &res_map, &statements);
+    if loop_arr.len() == 0 {
+      break;
+    }
 
-    let mut remove_list = vec![];
-    let mut add_list = vec![];
     for (index, item) in loop_arr.iter().enumerate() {
       match res_map.get(item) {
         Some(n) => {
-          remove_list.push(index);
           continue;
         }
         None => {}
@@ -54,16 +117,11 @@ fn parse1() {
       let s = statements.iter().find(|x| x.name == *item).unwrap();
       let num = match &s.op {
         OperateWrap::Number(n) => n.clone(),
+        OperateWrap::Unknown => unreachable!(),
         OperateWrap::Operate(op) => {
           let left = res_map.get(&op.left);
           let right = res_map.get(&op.right);
           if left.is_none() || right.is_none() {
-            if left.is_none() {
-              add_list.push(op.left.clone());
-            }
-            if right.is_none() {
-              add_list.push(op.right.clone());
-            }
             continue;
           }
 
@@ -72,26 +130,18 @@ fn parse1() {
             Operator::Minus => left.unwrap() - right.unwrap(),
             Operator::Multiply => left.unwrap() * right.unwrap(),
             Operator::Divide => left.unwrap() / right.unwrap(),
+            Operator::Equal => panic!("equal"),
           }
         }
       };
 
       res_map.insert(item.clone(), num);
-      remove_list.push(index);
     }
 
     loop_arr.clear();
-
-    if loop_arr.len() == 0 && save_arr.len() == 0 {
-      break;
-    }
   }
 
-  println!(
-    "now={:?} | res={:?}",
-    now.elapsed(),
-    res_map.get("root").unwrap()
-  );
+  return (res_map, save_arr);
 }
 
 fn calc_top_list(
