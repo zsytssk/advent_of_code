@@ -17,12 +17,14 @@ https://song.xlog.app/aoc-zh
 
 - @todo 试试去掉 clone 能不能提高性能
 
+### end
+
+- @ques loop 中 `OperateWrap::Unknown` 的处理
+
 - @ques 已经知道结果 value，怎么反推表达式的 value
 
 - @ques 怎么 loop
 - @ques 怎么计算表达式的值
-
-### end
 
 - @ques 难点 -> 怎么记录结果
 

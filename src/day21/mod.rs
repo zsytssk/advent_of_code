@@ -70,6 +70,12 @@ fn parse2() {
     }
     _ => unreachable!(),
   };
+
+  utils::parse_step2(&mut save_arr, &mut res_map, &statements);
+
+  let humn = res_map.get("humn").unwrap();
+
+  println!("time={:?} | res_map={:?}", now.elapsed(), humn);
 }
 
 fn parse_input() -> Vec<Statement> {

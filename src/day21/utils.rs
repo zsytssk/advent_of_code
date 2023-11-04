@@ -99,8 +99,81 @@ pub fn parse_step2(
   loop {
     let loop_arr = calc_top_step2(save_arr, res_map, statements);
 
-    if loop_arr.len() == 0 && save_arr.len() == 0 {
+    if loop_arr.len() == 0 {
+      println!("save_arr={:?}", save_arr);
       break;
+    }
+
+    for item in loop_arr.iter() {
+      let state_value = res_map.get(item).unwrap().clone(); // 必定有
+      let statement = statements.iter().find(|x| x.name == *item).unwrap();
+      match &statement.op {
+        OperateWrap::Unknown => {
+          println!("{:?}", res_map.get(item));
+        }
+        OperateWrap::Operate(op) => {
+          let left = res_map.get(&op.left);
+          let right = res_map.get(&op.right);
+
+          // 防止意外
+          if left.is_none() && right.is_none() {
+            continue;
+          }
+
+          match &op.opr {
+            Operator::Add => {
+              let (key, val) = if left.is_some() {
+                (op.right.clone(), left.unwrap())
+              } else {
+                (op.left.clone(), right.unwrap())
+              };
+
+              let side_val = state_value - val;
+              res_map.insert(key, side_val);
+            }
+            Operator::Minus => {
+              if right.is_some() {
+                let right_val = right.unwrap();
+                let left_val = right_val + state_value;
+                res_map.insert(op.left.clone(), left_val);
+                continue;
+              }
+
+              if left.is_some() {
+                let left_val = left.unwrap().clone();
+                let right_val = left_val - state_value;
+                let key = op.right.clone();
+                res_map.insert(key, right_val);
+              }
+            }
+            Operator::Multiply => {
+              let (key, val) = if left.is_some() {
+                (op.right.clone(), left.unwrap())
+              } else {
+                (op.left.clone(), right.unwrap())
+              };
+
+              let side_val = state_value / val;
+              res_map.insert(key, side_val);
+            }
+            Operator::Divide => {
+              if left.is_some() {
+                let left_val = left.unwrap();
+                let right_val = left_val / state_value;
+                res_map.insert(op.right.clone(), right_val);
+                continue;
+              }
+              if right.is_some() {
+                let right_val = right.unwrap();
+                let left_val = right_val * state_value;
+                res_map.insert(op.left.clone(), left_val);
+              }
+            }
+            Operator::Equal => panic!("equal"),
+          };
+        }
+        _ => unreachable!(),
+      };
     }
   }
 }
@@ -112,20 +185,32 @@ pub fn calc_top_step2(
 ) -> Vec<String> {
   let mut arr = vec![];
   save_arr.retain(|item| {
+    if res_map.get(item).is_none() {
+      return true;
+    }
     let statement = statements.iter().find(|x| x.name == *item).unwrap();
     match &statement.op {
       OperateWrap::Operate(op) => {
         let left = res_map.get(&op.left);
         let right = res_map.get(&op.right);
-        if left.is_none() || right.is_none() {
+        if left.is_none() && right.is_none() {
           return true;
+        }
+
+        // 防止意外
+        if left.is_some() && right.is_some() {
+          return false;
         }
 
         arr.push(item.clone());
         return false;
       }
-      _ => panic!(),
+      OperateWrap::Unknown => return false,
+      _ => unreachable!(),
     };
+
+    arr.push(item.clone());
+    return false;
   });
 
   arr
