@@ -7,11 +7,34 @@ https://song.xlog.app/aoc-zh
 - @ques 可以看看答案 -> ...
 
 - @todo
+
   - 优化简历
   - 朋友内推
   - 基本算法
   - 微前端 + ts 基础题目
   - 基础题目...
+
+- 壮大 -> 放松大脑的时候 思考 | 忘我的时候行动
+
+## day22
+
+- @ques
+
+  - 怎么确定 立方体 每一个面对应的位置
+    - 先写死坐标
+  - 怎么在不同的面中跳转（三围立体坐标）
+
+- @ques get_opposite_p 只有这个需要改
+
+- @rem
+  - Regex split | split_keep
+  - 把 enum 转换称 number, 然后再转换回来
+
+### end
+
+- @ques test 上下左右 get_opposite_p
+
+- @todo 把走过的路画出来
 
 ## day21
 
