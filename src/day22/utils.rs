@@ -4,7 +4,7 @@ pub fn split_keep(re: Regex, text: &str) -> Vec<String> {
   let mut prev_end = 0;
 
   let mut arr = vec![];
-  for (i, mat) in re.find_iter(text).enumerate() {
+  for mat in re.find_iter(text) {
     let start = mat.start();
     let end = mat.end();
 

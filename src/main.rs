@@ -13,6 +13,7 @@ mod day2;
 mod day20;
 mod day21;
 mod day22;
+mod day23;
 mod day3;
 mod day4;
 mod day5;
@@ -44,5 +45,6 @@ fn main() {
   // day19::parse();
   //   day20::parse();
   // day21::parse();
-  day22::parse();
+  // day22::parse();
+  day23::parse();
 }
