@@ -1,5 +1,5 @@
 use std::{
-  cell::{RefCell, RefMut},
+  cell::{Ref, RefCell},
   collections::HashMap,
 };
 
@@ -15,10 +15,7 @@ pub fn get_next_point(p: &RefCell<Point>, move_dir: &MoveDir) -> (i32, i32) {
   }
 }
 
-pub fn not_need_move(
-  p: &RefCell<Point>,
-  points: &Vec<&RefCell<Point>>,
-) -> bool {
+pub fn not_need_move(p: &RefCell<Point>, points: &Vec<Ref<Point>>) -> bool {
   let p = p.borrow();
   let rel_points = [
     (p.x - 1, p.y - 1),
@@ -32,7 +29,6 @@ pub fn not_need_move(
   ];
 
   for p in points.iter() {
-    let p = p.borrow();
     let p = (p.x, p.y);
     if rel_points.contains(&p) {
       return false;
@@ -45,7 +41,7 @@ pub fn not_need_move(
 pub fn can_move(
   p: &RefCell<Point>,
   move_dir: &MoveDir,
-  points: &Vec<&RefCell<Point>>,
+  points: &Vec<Ref<Point>>,
 ) -> bool {
   let p = p.borrow();
   let rel_points = match move_dir {
@@ -56,7 +52,6 @@ pub fn can_move(
   };
 
   for p in points.iter() {
-    let p = p.borrow();
     let p = (p.x, p.y);
     if rel_points.contains(&p) {
       return false;
@@ -64,6 +59,29 @@ pub fn can_move(
   }
 
   true
+}
+
+pub fn get_nearby_points<'a>(
+  p: &'a RefCell<Point>,
+  points: &Vec<&'a RefCell<Point>>,
+) -> Vec<Ref<'a, Point>> {
+  let range_x = (p.borrow().x - 1, p.borrow().x + 1);
+  let range_y = (p.borrow().y - 1, p.borrow().y + 1);
+
+  let mut arr = vec![];
+
+  for item in points.iter() {
+    let p = item.borrow();
+    if p.x >= range_x.0
+      && p.x <= range_x.1
+      && p.y >= range_y.0
+      && p.y <= range_y.1
+    {
+      arr.push(p);
+    }
+  }
+
+  arr
 }
 
 pub fn remove_dul_p(move_map: &mut HashMap<usize, (i32, i32)>) {
@@ -81,12 +99,13 @@ pub fn remove_dul_p(move_map: &mut HashMap<usize, (i32, i32)>) {
   }
 }
 
-pub fn get_range(points: &Vec<RefMut<Point>>) -> ((i32, i32), (i32, i32)) {
+pub fn get_range(points: &Vec<&RefCell<Point>>) -> ((i32, i32), (i32, i32)) {
   let mut min_x = 0;
   let mut max_x = 0;
   let mut min_y = 0;
   let mut max_y = 0;
   for p in points.iter() {
+    let p = p.borrow();
     if p.x > max_x {
       max_x = p.x
     }

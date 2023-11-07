@@ -16,7 +16,27 @@ https://song.xlog.app/aoc-zh
 
 ## day23
 
-- @ques 如何在过程中动态的更新地图大小
+- 性能 ->
+
+  - `loop` >
+    - `for (n * 4)` >
+      - `not_need_move(8*n) + can_move(3 * n)`
+    - `remove_dul_p(n) + for(n)`
+  - 优化后 `loop` > `for (n*n)` + `remove_dul_p(n) + for(n)`
+  - 还能不能再优化 -> 不行了
+
+- @todo 优化性能
+
+  - 只要对比附近的点就可以了 -> get_rel_point
+  - 所有 loop 的地方
+
+- @todo learn
+
+  - 同时要修改多个 point 的坐标，这怎么处理？
+  - 怎么删除多个相同的坐标
+  - 如何在过程中动态的更新地图大小 -> `map -> RefCell`
+
+### end
 
 - @ques 怎么移动
 - @ques 怎么判断两个同时移动到一个地方？

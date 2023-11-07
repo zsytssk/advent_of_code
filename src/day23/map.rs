@@ -37,12 +37,17 @@ impl Map {
       .points
       .iter()
       .filter(|item| item.borrow().has_elf)
-      //   .map(|p| p.borrow_mut())
       .collect()
   }
   pub fn update_range(&mut self, range: ((i32, i32), (i32, i32))) {
     self.range_x = range.0;
     self.range_y = range.1;
+  }
+  pub fn get_empty_size(&self) -> i32 {
+    let x = self.range_x.1 - self.range_x.0;
+    let y = self.range_y.1 - self.range_y.0;
+
+    (x + 1) * (y + 1) - self.points.len() as i32
   }
 }
 
