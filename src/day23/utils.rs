@@ -15,7 +15,10 @@ pub fn get_next_point(p: &RefCell<Point>, move_dir: &MoveDir) -> (i32, i32) {
   }
 }
 
-pub fn not_need_move(p: &RefCell<Point>, points: &Vec<Ref<Point>>) -> bool {
+pub fn not_need_move(
+  p: &RefCell<Point>,
+  nearby_map: &HashMap<(i32, i32), bool>,
+) -> bool {
   let p = p.borrow();
   let rel_points = [
     (p.x - 1, p.y - 1),
@@ -28,9 +31,8 @@ pub fn not_need_move(p: &RefCell<Point>, points: &Vec<Ref<Point>>) -> bool {
     (p.x + 1, p.y + 1),
   ];
 
-  for p in points.iter() {
-    let p = (p.x, p.y);
-    if rel_points.contains(&p) {
+  for p in rel_points {
+    if nearby_map.contains_key(&p) {
       return false;
     }
   }
@@ -41,7 +43,7 @@ pub fn not_need_move(p: &RefCell<Point>, points: &Vec<Ref<Point>>) -> bool {
 pub fn can_move(
   p: &RefCell<Point>,
   move_dir: &MoveDir,
-  points: &Vec<Ref<Point>>,
+  nearby_map: &HashMap<(i32, i32), bool>,
 ) -> bool {
   let p = p.borrow();
   let rel_points = match move_dir {
@@ -51,9 +53,8 @@ pub fn can_move(
     MoveDir::East => [(p.x + 1, p.y - 1), (p.x + 1, p.y), (p.x + 1, p.y + 1)],
   };
 
-  for p in points.iter() {
-    let p = (p.x, p.y);
-    if rel_points.contains(&p) {
+  for p in rel_points {
+    if nearby_map.contains_key(&p) {
       return false;
     }
   }
@@ -64,11 +65,11 @@ pub fn can_move(
 pub fn get_nearby_points<'a>(
   p: &'a RefCell<Point>,
   points: &Vec<&'a RefCell<Point>>,
-) -> Vec<Ref<'a, Point>> {
+) -> HashMap<(i32, i32), bool> {
   let range_x = (p.borrow().x - 1, p.borrow().x + 1);
   let range_y = (p.borrow().y - 1, p.borrow().y + 1);
 
-  let mut arr = vec![];
+  let mut nearby_map = HashMap::new();
 
   for item in points.iter() {
     let p = item.borrow();
@@ -77,26 +78,23 @@ pub fn get_nearby_points<'a>(
       && p.y >= range_y.0
       && p.y <= range_y.1
     {
-      arr.push(p);
+      nearby_map.insert((p.x, p.y), true);
     }
   }
 
-  arr
+  nearby_map
 }
 
 pub fn remove_dul_p(move_map: &mut HashMap<usize, (i32, i32)>) {
-  let mut remove_arr = vec![];
-  for (key, p) in move_map.iter() {
-    let dul_item = move_map.iter().find(|item| item.1 == p && item.0 != key);
+  let mut values: HashMap<(i32, i32), usize> = HashMap::new();
 
-    if dul_item.is_some() {
-      remove_arr.push(key.clone());
-    }
+  // 统计每个值的出现次数
+  for (_, value) in move_map.iter() {
+    *values.entry(value.clone()).or_insert(0) += 1;
   }
 
-  for key in remove_arr {
-    move_map.remove(&key);
-  }
+  // 删除具有相同值的所有项
+  move_map.retain(|_, value| values.get(value) == Some(&1));
 }
 
 pub fn get_range(points: &Vec<&RefCell<Point>>) -> ((i32, i32), (i32, i32)) {

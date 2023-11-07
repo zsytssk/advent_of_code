@@ -13,8 +13,8 @@ use map::*;
 use utils::*;
 
 pub fn parse() {
-  parse1();
-  // parse2();
+  // parse1();
+  parse2();
 }
 
 fn parse1() {
