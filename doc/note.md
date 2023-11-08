@@ -14,11 +14,62 @@ https://song.xlog.app/aoc-zh
   - 微前端 + ts 基础题目
   - 基础题目...
 
+- font emoji
+
+## day24
+
+- @ques 计算每一个步的消耗
+
+- @ques 如何减少 loop 的可能性
+- @ques 减少在原地不动的选项
+
+- @ques quick_step
+
+- @ 整个风的运动是不是周期性的
+
+- @ques 计算每一个格子出现空白的时间
+
+- @ques 或者 loop 哪里性能有问题
+
+- @ques 有没有更好的方式
+
+- @ques calc_top_pos 已经移动的距离 + 距离中终点的距离
+
+- @ques get_nest_pos 可以原地等待
+
+- @learn 怎么合并两个数组
+
+  - split_off
+  - `last_key.1.abs_diff(end.1)`
+  - 怎么 split_off 前面的 item - extend to the
+
+- @learn Copy trait 是做什么的
+- @ques 地图的形状 print 的时候能不能做成幻灯片的形式
+
+  - println replace
+
+- @ques 感觉这里可能会有性能问题
+
+  - 在某个确切时间点 到达某个点的 -> 如果已经存在不做处理了
+  - 找下一个点，只要找附近的就可以了
+  - 如果我有办法 只更新附近的点就好了 -> 就会更快
+    - 也许有的 开始位置 + 时间 + 结束位置的公式 就好了
+
+- @ques `for in in 0..0 {}` 会执行吗 -> 不会 -> 那个为啥会出问题
+
+### end
+
+- get_next + calc_top
+
+- @ques wind 移动清除怎么处理
+- @ques 风的移动逻辑怎么处理
+
+- @ques 每一个点都要找到
+- @ques 多个风合在一起我怎么处理
+
 ## day23
 
-- @ques nearby_points 变成 hashmap 反而变慢了，可能是 clone 导致的
-
-  - get().is_some 导致的
+- @que 性能优化 -> `https://github.com/Gobbel2000/advent-of-code/blob/master/src/bin/day23-1.rs`
 
 - @todo learn
 
@@ -28,6 +79,10 @@ https://song.xlog.app/aoc-zh
   - 怎么删除多个相同的坐标
 
 ### end
+
+- @ques nearby_points 变成 hashmap 反而变慢了，可能是 clone 导致的
+
+  - get().is_some 导致的
 
 - 性能 ->
 
