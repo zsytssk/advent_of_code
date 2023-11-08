@@ -46,7 +46,7 @@ fn parse1() {
     }
     loop_keys.extend(add_list);
 
-    if loop_index % 10000 == 0 {
+    if loop_index % 1000 == 0 {
       println!(
         "num={:?}| temp_keys={:?} | loop_keys={}",
         get_complete_num(&completed_keys),

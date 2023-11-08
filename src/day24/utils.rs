@@ -99,6 +99,10 @@ pub fn get_nearby_pos(p: &(i32, i32), map: &Map) -> Vec<(i32, i32)> {
     }
   }
 
+  if arr.len() > 1 {
+    arr.retain(|&item| item != (p.0, p.1))
+  }
+
   arr
 }
 
@@ -110,13 +114,13 @@ pub fn calc_top_keys(
 ) {
   let few_step = get_complete_num(completed_keys);
 
-  let max_num = 1000;
-  if loop_keys.len() == 0 {
-    let change_num = cmp::min(max_num, temp_keys.len());
-    let add_list = temp_keys.split_off(temp_keys.len() - change_num);
+  // let max_num = 100;
+  // if loop_keys.len() == 0 {
+  //   let change_num = cmp::min(max_num, temp_keys.len());
+  //   let add_list = temp_keys.split_off(temp_keys.len() - change_num);
 
-    loop_keys.extend(add_list);
-  }
+  //   loop_keys.extend(add_list);
+  // }
 
   loop_keys.retain(|item| {
     if item.is_end(map) {
@@ -142,10 +146,10 @@ pub fn calc_top_keys(
     rate_a.cmp(&rate_b)
   });
 
-  if loop_keys.len() > max_num {
-    let temp_save_ele = loop_keys.split_off(max_num);
-    temp_keys.extend(temp_save_ele);
-  }
+  // if loop_keys.len() > max_num {
+  //   let temp_save_ele = loop_keys.split_off(max_num);
+  //   temp_keys.extend(temp_save_ele);
+  // }
 }
 
 pub fn get_complete_num(completed_keys: &Vec<MoveKey>) -> usize {

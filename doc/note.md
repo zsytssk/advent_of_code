@@ -16,22 +16,45 @@ https://song.xlog.app/aoc-zh
 
 - font emoji
 
+## 2023-11-08 18:09:18
+
+- @ques 计算每一个循环的消耗
+
+  - loop_keys n > get_nearby_pos(5)
+  - calc_top_keys > n + n
+
+  - update_map 中的 loop 可以指更新当前位置附近关联风的变化（我需要计算每一个风的公式）
+    - loop 也要正好是当前的步数
+
+- @ques 减少在原地不动的选项
+  - 有一点用，没有改变多少
+
 ## day24
 
-- @ques 计算每一个步的消耗
+- 这题停难的
 
-- @ques 如何减少 loop 的可能性
-- @ques 减少在原地不动的选项
+- @ques 感觉我 loop 有问题
+
+  - 我在 loop 中取更新节点 每次都更新节点，但是在 calc_top_keys 改变的 item
+  - 可能导致每次的 loop,和 loop_keys 不匹配
+  - 我需要在每一个 key 中去记录他的步数，同时 loop_keys 中的步数应该是一样的
+  - 同时 update_map 要能直接根据步数来变化(方向长度是周期)
+
+- @ques `breadth-first search (BFS)`
+
+- 要想不到一个好的逻辑来解决这个问题，应该没有办法解决
+
+  - 每一个缝隙的可能性 -> 看不到方向
 
 - @ques quick_step
 
 - @ 整个风的运动是不是周期性的
 
+  - 是的
+
 - @ques 计算每一个格子出现空白的时间
 
 - @ques 或者 loop 哪里性能有问题
-
-- @ques 有没有更好的方式
 
 - @ques calc_top_pos 已经移动的距离 + 距离中终点的距离
 
@@ -58,6 +81,8 @@ https://song.xlog.app/aoc-zh
 - @ques `for in in 0..0 {}` 会执行吗 -> 不会 -> 那个为啥会出问题
 
 ### end
+
+- @ques 有没有更好的方式
 
 - get_next + calc_top
 
