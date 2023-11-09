@@ -1,6 +1,6 @@
 use std::fmt;
 
-use super::utils::parse_snafu;
+use super::utils::{init_to_snafu, parse_snafu, to_str};
 
 pub struct Snafu {
   src: String,
@@ -16,18 +16,17 @@ impl Snafu {
       digits,
     }
   }
-  pub fn from_decimal(src: &str) -> Self {
-    Snafu {
-      src: src.to_string(),
-      digits: Vec::new(),
-    }
+  pub fn from_decimal(num: i64) -> Self {
+    let digits = init_to_snafu(num as f64);
+    let src = to_str(&digits);
+
+    Snafu { src, digits }
   }
   pub fn as_str(&self) -> &str {
     &self.src
   }
   pub fn to_decimal(&self) -> i64 {
     let digits = &self.digits;
-    println!("digits:{:?}", digits);
 
     let mut num = 0;
     for (index, digit) in digits.iter().enumerate() {

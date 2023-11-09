@@ -15,12 +15,15 @@ fn parse1() {
   let list = parse_input();
 
   let sum: i64 = list.iter().map(|item| item.to_decimal()).sum();
+  let snafu = Snafu::from_decimal(sum);
+
+  println!("{:?}", snafu);
 
   println!("{:?}", sum);
 }
 
 fn parse_input() -> Vec<Snafu> {
-  let content = read_file("day25/demo.txt").unwrap();
+  let content = read_file("day25/input.txt").unwrap();
 
   content
     .split("\n")
