@@ -14,7 +14,29 @@ https://song.xlog.app/aoc-zh
   - 微前端 + ts 基础题目
   - 基础题目...
 
-- font emoji
+- @todo 词典
+
+## day25
+
+- @ques 十进制怎么转换为 2 进制
+
+- @learn
+  - rust pow iter -> `base.powf(exponent);`
+  - rust reverse iter
+  - sqrt 和 log 有什么关系
+
+```
+the trait bound `StrSearcher<'_, '_>: DoubleEndedSearcher<'_>` is not satisfied
+```
+
+### end
+
+- 做一个数字转换
+
+## 2023-11-08 20:19:57
+
+- @ques list 的 len 就是 step
+  - 感觉还是不行，如果 update_map 每次都是当前的 step， 那么 map 必须保持初始状态
 
 ## day24(没有实现)
 
@@ -61,6 +83,7 @@ https://song.xlog.app/aoc-zh
 
 ### end
 
+- font emoji
 - @ 整个风的运动是不是周期性的
 
   - 是的

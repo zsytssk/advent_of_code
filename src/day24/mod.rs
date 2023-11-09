@@ -1,5 +1,5 @@
 #![allow(unused)]
-use std::vec;
+use std::{time::Instant, vec};
 
 use crate::utils::read_file;
 
@@ -15,6 +15,7 @@ pub fn parse() {
 }
 
 fn parse1() {
+  let now = Instant::now();
   let mut map = parse_input();
   let start = map.get_start();
   // let end = map.get_p(&(1,));
@@ -46,14 +47,14 @@ fn parse1() {
     }
     loop_keys.extend(add_list);
 
-    if loop_index % 1000 == 0 {
-      println!(
-        "num={:?}| temp_keys={:?} | loop_keys={}",
-        get_complete_num(&completed_keys),
-        temp_keys.len(),
-        loop_keys.len()
-      );
-    }
+    // if loop_index % 1000 == 0 {
+    //   println!(
+    //     "num={:?}| temp_keys={:?} | loop_keys={}",
+    //     get_complete_num(&completed_keys),
+    //     temp_keys.len(),
+    //     loop_keys.len()
+    //   );
+    // }
     calc_top_keys(&mut loop_keys, &mut temp_keys, &mut completed_keys, &map);
 
     if loop_keys.len() == 0 && temp_keys.len() == 0 {
@@ -65,12 +66,12 @@ fn parse1() {
   }
 
   let num = completed_keys[0].get_num() - 1;
-  println!("num={:?}", num);
+  println!("now={:?}|num={:?}", now.elapsed(), num);
   println!("{:?}", map);
 }
 
 fn parse_input() -> Map {
-  let content = read_file("day24/input.txt").unwrap();
+  let content = read_file("day24/demo1.txt").unwrap();
 
   Map::from_str(&content)
 }
