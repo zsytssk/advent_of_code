@@ -45,7 +45,7 @@ pub fn init_to_snafu(num: f64) -> Vec<i8> {
   let mut v = vec![0; (top_level as usize) + 1];
   v[top_level as usize] = (neg_num as i8) * top_num as i8;
 
-  println!("{:?}|{}", v, remain);
+  //   println!("{:?}|{}", v, remain);
   if remain != 0.0 {
     let sub_v = init_to_snafu(remain);
     for i in 0..sub_v.len() {
